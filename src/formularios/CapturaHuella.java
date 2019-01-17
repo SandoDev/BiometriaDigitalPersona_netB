@@ -453,15 +453,16 @@ public class CapturaHuella extends javax.swing.JFrame {
             Connection c = con.conectar(); //establece la conexion con la BD
             System.out.println("conectado a la base de datos");
             //realiza la insercion de los datos
-            PreparedStatement  guardarStmt = c.prepareStatement("INSERT INTO somhue(huenom, huehuella) values(?,?)");
+            PreparedStatement guardarStmt = c.prepareStatement("INSERT INTO somhue(huenom, huehuella) values(?,?)");
 
-            System.out.println("preparada la sentencia");
             guardarStmt.setString(1, nombre);
-            System.out.println("modificada la sentencia 1");
             guardarStmt.setBinaryStream(2, datosHuella, tamañoHuella);
-            System.out.println("modificada la sentencia 2");
             //Ejecuta la sentencia
-            guardarStmt.execute();
+            if (guardarStmt.execute()) {
+                System.out.println("ejecutada la sentencia la sentencia");
+            } else {
+                System.out.println("no ejecutada la sentencia la sentencia");
+            }
             System.out.println("ejecutada la sentencia la sentencia");
 
             guardarStmt.close();

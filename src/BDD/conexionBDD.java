@@ -21,7 +21,7 @@ public class conexionBDD {
     public String db = "huellas";//nombre de la base de datos
     public String user = "root";//usuario
     public String pass = "mysqlsando";//password
-    public String extraSSL = "?autoReconnect=true&useSSL=false";//password
+    public String extraSSL = "?autoReconnect=true&useSSL=false";//extra que se agrega para que no de error
 
     Connection conn = null;//concxion inicializada
 
