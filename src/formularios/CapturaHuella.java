@@ -419,8 +419,8 @@ public class CapturaHuella extends javax.swing.JFrame {
                         stop();
                         setTemplate(Reclutador.getTemplate());
                         EnviarTexto("La Plantilla de la Huella ha Sido Creada, ya puede Verificarla o Identificarla");
-                        btnIdentificar.setEnabled(false);
-                        btnVerificar.setEnabled(false);
+                        btnIdentificar.setEnabled(true);
+                        btnVerificar.setEnabled(true);
                         btnGuardar.setEnabled(true);
                         btnGuardar.grabFocus();
                         break;
@@ -483,7 +483,7 @@ public class CapturaHuella extends javax.swing.JFrame {
             //Establece los valores para la sentencia SQL
             Connection c = con.conectar();
             //Obtiene la plantilla correspondiente a la persona indicada
-            PreparedStatement verificarStmt = c.prepareStatement("SELECT huehuella FROM somhue WHERE huenombre=?");
+            PreparedStatement verificarStmt = c.prepareStatement("SELECT huehuella FROM somehue WHERE huenombre=?");
             verificarStmt.setString(1, nom);
             ResultSet rs = verificarStmt.executeQuery();
 
@@ -528,7 +528,7 @@ public class CapturaHuella extends javax.swing.JFrame {
             Connection c = con.conectar();
 
             //Obtiene todas las huellas de la bd
-            PreparedStatement identificarStmt = c.prepareStatement("SELECT huenombre,huehuella FROM somhue");
+            PreparedStatement identificarStmt = c.prepareStatement("SELECT huenombre,huehuella FROM somehue");
             ResultSet rs = identificarStmt.executeQuery();
 
             //Si se encuentra el nombre en la base de datos
