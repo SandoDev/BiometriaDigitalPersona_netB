@@ -38,10 +38,10 @@ public class conexionBDD {
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
         } catch (ClassNotFoundException e) {
-            JOptionPane.showMessageDialog(null, "Se produjo el siguiente error:" + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Se produjo el siguiente error1:" + e.getMessage());
         } catch (NullPointerException e) {
             JOptionPane.showMessageDialog(null,
-                    "Se produjo el siguiente error:" + e.getMessage());
+                    "Se produjo el siguiente error2:" + e.getMessage());
         } finally {
             return conn;
         }
