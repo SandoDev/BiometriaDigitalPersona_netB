@@ -30,10 +30,10 @@ public class conexionBDD {
             String ruta = "jdbc:mysql://";
             String servidor = nomservidor + ":" + puerto + "/";
             Class.forName("com.mysql.jdbc.Driver");
-            
+
             //genero la conexion
-            conn = DriverManager.getConnection(ruta + servidor + db+extraSSL, user, pass);
-            
+            conn = DriverManager.getConnection(ruta + servidor + db + extraSSL, user, pass);
+
             if (conn != null) {
                 System.out.println("Conección a base de datos listo...");
             } else if (conn == null) {
