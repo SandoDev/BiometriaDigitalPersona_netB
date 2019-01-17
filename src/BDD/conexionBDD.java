@@ -21,6 +21,7 @@ public class conexionBDD {
     public String db = "huellas";//nombre de la base de datos
     public String user = "root";//usuario
     public String pass = "mysqlsando";//password
+    public String extraSSL = "?autoReconnect=true&useSSL=false";//password
 
     Connection conn = null;//concxion inicializada
 
@@ -29,7 +30,10 @@ public class conexionBDD {
             String ruta = "jdbc:mysql://";
             String servidor = nomservidor + ":" + puerto + "/";
             Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection(ruta + servidor + db, user, pass);
+            
+            //genero la conexion
+            conn = DriverManager.getConnection(ruta + servidor + db+extraSSL, user, pass);
+            
             if (conn != null) {
                 System.out.println("Conección a base de datos listo...");
             } else if (conn == null) {
