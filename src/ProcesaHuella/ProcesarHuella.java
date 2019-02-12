@@ -176,7 +176,7 @@ public class ProcesarHuella extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
 
                 String nom = txt_nom.getText();
-                String link = "http://localhost/destino.php?saludo=" + nom;
+                String link = "http://localhost/BiometriaDigitalPerson/BiometriaDigitalPersonan_php/gestorHuella/moduloPrestamo.php?user=" + nom;
                 llamarPHP(link);
                 sendPost(nom, enlace);
 
