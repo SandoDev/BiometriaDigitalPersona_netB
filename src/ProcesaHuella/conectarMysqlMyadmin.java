@@ -23,6 +23,11 @@ public class conectarMysqlMyadmin {
     private static final String url = "jdbc:mysql://localhost:3306/" + bdd;
 
     //metodo que retorna la conexion
+
+    /**
+     *
+     * @return
+     */
     public Connection getConnection() {
         conn = null;
         try {
@@ -40,11 +45,14 @@ public class conectarMysqlMyadmin {
     }
 
     //metodo que desconecta de la base de datos
+
+    /**
+     *
+     */
     public void desconectar() {
         conn = null;//se cierra la conexion asignado la variable a null
         if (conn == null) {
             System.out.println("Desconectado de la base de datos: " + bdd);
         }
     }
-
 }

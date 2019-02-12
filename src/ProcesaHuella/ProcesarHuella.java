@@ -24,15 +24,30 @@ import com.digitalpersona.onetouch.processing.DPFPFeatureExtraction;
 import com.digitalpersona.onetouch.processing.DPFPImageQualityException;
 import com.digitalpersona.onetouch.verification.DPFPVerification;
 import com.digitalpersona.onetouch.verification.DPFPVerificationResult;
+import com.github.sarxos.webcam.Webcam;
+import com.github.sarxos.webcam.WebcamPanel;
+import com.github.sarxos.webcam.WebcamResolution;
 import formularios.CapturaHuella;
 import static formularios.CapturaHuella.TEMPLATE_PROPERTY;
+import java.awt.Color;
+import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.sql.Connection;
@@ -40,13 +55,17 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -57,6 +76,15 @@ import org.json.simple.JSONValue;
  */
 public class ProcesarHuella extends javax.swing.JFrame {
 
+    private Dimension ds = new Dimension(450, 360);
+    private Dimension cs = WebcamResolution.VGA.getSize();
+    private Webcam wCam = Webcam.getDefault();
+    private WebcamPanel wCamPanel = new WebcamPanel(wCam, ds, false);
+    FileInputStream myStream;
+    byte[] imageInBytes;
+    private static final String USER_AGENT = "Mozilla/5.0";
+    //private static final String SERVER_PATH = "http://localhost/";//la variable ya estaba definida
+    String enlace = "";
     //parametros para la conexion con php
     //private static final String USER_AGENT = "Mozilla/5.0";
     private static final String SERVER_PATH = "http://localhost/BiometriaDigitalPerson/gestorHuella/";
@@ -73,9 +101,15 @@ public class ProcesarHuella extends javax.swing.JFrame {
     private DPFPEnrollment Reclutador = DPFPGlobal.getEnrollmentFactory().createEnrollment();
 
     //crear una nueva huella
+    /**
+     *
+     */
     public DPFPFeatureSet featuresinscripcion;
 
     //verificar una huella ya existente
+    /**
+     *
+     */
     public DPFPFeatureSet featuresverificacion;
 
     //Variable que para crear el template de la huella luego de que se hallan creado las caracteriticas
@@ -92,6 +126,188 @@ public class ProcesarHuella extends javax.swing.JFrame {
     public ProcesarHuella() {
         initComponents();
         this.setLocationRelativeTo(null);//aparece en medio de la pantalla
+        wCam.setViewSize(cs);
+        wCamPanel.setFillArea(true);
+        panelCam.setLayout(new FlowLayout());
+        panelCam.add(wCamPanel);
+    }
+
+    private static final class PlayerPanel extends JPanel {
+
+        //private static final long serialVersionUID = 1L;
+        private final BufferedImage images;
+        private final Dimension size;
+        //private int offset = 0;
+
+        public PlayerPanel(BufferedImage images) {
+            super();
+            this.images = images;
+            this.size = new Dimension(640, 480);
+            setPreferredSize(size);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            g.setColor(Color.WHITE);
+            g.fillRect(0, 0, getWidth(), getHeight());
+            g.drawImage(images, 0, 0, null);
+        }
+    }
+
+    public void mostrar(BufferedImage images) {
+        //Dimension cs = WebcamResolution.VGA.getSize();
+        //Webcam w = Webcam.getDefault();
+        //w.setViewSize(cs);
+        //w.open(true);
+
+        JButton btnGuardar, btnBorrar;
+        JTextField txt_nom;
+        txt_nom = new JTextField();
+        txt_nom.setBounds(670, 110, 100, 30);
+        btnBorrar = new JButton("Tomar otra");
+        btnGuardar = new JButton("Guardar");
+        btnGuardar.setBounds(670, 50, 100, 40);
+        btnBorrar.setBounds(670, 300, 100, 40);
+
+        System.out.println("Tomando la foto");
+
+        //images=w.getImage();
+        btnGuardar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                String nom = txt_nom.getText();
+                String link = "http://localhost/destino.php?saludo=" + nom;
+                llamarPHP(link);
+                sendPost(nom, enlace);
+
+            }
+        });
+
+        //w.close();
+        System.out.println("play");
+
+        PlayerPanel panel = new PlayerPanel(images);
+
+        JFrame f = new JFrame("Ejemplo de Foto");
+        f.setMinimumSize(new Dimension(800, 540));
+        f.add(btnGuardar);
+        f.add(btnBorrar);
+        f.add(txt_nom);
+        f.add(panel);
+        f.pack();
+        f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        f.setVisible(true);
+        btnBorrar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                f.setVisible(false);
+                File fichero = new File(enlace);
+                eliminarFichero(fichero);
+
+            }
+        });
+    }
+
+    public void llamarPHP(String link) {
+
+        URL url = null;
+        try {
+            url = new URL(link);
+            try {
+                Desktop.getDesktop().browse(url.toURI());
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+        } catch (MalformedURLException e1) {
+            e1.printStackTrace();
+        }
+
+    }
+
+    public static void eliminarFichero(File fichero) {
+
+        if (!fichero.exists()) {
+            System.out.println("El archivo data no existe.");
+        } else {
+            fichero.delete();
+            System.out.println("El archivo data fue eliminado.");
+        }
+
+    }
+
+    public void sendPost(String nombre, String name) {
+        /*
+        try {
+            myStream = new FileInputStream("src/Images/test.jpg");
+        } catch (FileNotFoundException ex) {
+            System.out.println("Hubo Errores"+ex.getMessage());
+        }
+        
+        try {
+            imageInBytes = IOUtils.toByteArray(myStream);
+        } catch (IOException ex) {
+            System.out.println("Hubo Errores"+ex.getMessage());
+        }*/
+
+        System.out.println("Datos Entrantes: \n" + nombre + "\n" + enlace);
+        //Creamos un objeto JSON
+        JSONObject jsonObj = new JSONObject();
+        //Añadimos el nombre, apellidos y email del usuario
+
+        jsonObj.put("img_nombre", nombre);
+        jsonObj.put("img_contenido", enlace);
+        //Creamos una lista para almacenar el JSON
+        List l = new LinkedList();
+        l.addAll(Arrays.asList(jsonObj));
+        //Generamos el String JSON
+        String jsonString = JSONValue.toJSONString(l);
+        System.out.println("JSON GENERADO:");
+        System.out.println(jsonString);
+        System.out.println("");
+
+        try {
+            //Codificar el json a URL
+            jsonString = URLEncoder.encode(jsonString, "UTF-8");
+            //Generar la URL
+            String url = SERVER_PATH + "listenPostC.php";
+            //Creamos un nuevo objeto URL con la url donde queremos enviar el JSON
+            URL obj = new URL(url);
+            //Creamos un objeto de conexión
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+            //Añadimos la cabecera
+            con.setRequestMethod("POST");
+            con.setRequestProperty("User-Agent", USER_AGENT);
+            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+            //Creamos los parametros para enviar
+            String urlParameters = "json=" + jsonString;
+            // Enviamos los datos por POST
+            con.setDoOutput(true);
+            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+            wr.writeBytes(urlParameters);
+            wr.flush();
+            wr.close();
+            //Capturamos la respuesta del servidor
+            int responseCode = con.getResponseCode();
+            System.out.println("\nSending 'POST' request to URL : " + url);
+            System.out.println("Post parameters : " + urlParameters);
+            System.out.println("Response Code : " + responseCode);
+
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            //Mostramos la respuesta del servidor por consola
+            System.out.println(response);
+            //cerramos la conexión
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -103,6 +319,7 @@ public class ProcesarHuella extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        panelCam = new javax.swing.JPanel();
         panHuellas = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         lblImagenHuella = new javax.swing.JLabel();
@@ -112,6 +329,8 @@ public class ProcesarHuella extends javax.swing.JFrame {
         btnVerificar = new javax.swing.JButton();
         btnIdentificar = new javax.swing.JButton();
         btnGuardar = new javax.swing.JButton();
+        btStart = new javax.swing.JButton();
+        btCapture = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtArea = new javax.swing.JTextArea();
@@ -125,6 +344,21 @@ public class ProcesarHuella extends javax.swing.JFrame {
                 formWindowOpened(evt);
             }
         });
+
+        panelCam.setBackground(new java.awt.Color(0, 0, 0));
+        panelCam.setForeground(new java.awt.Color(255, 255, 255));
+        panelCam.setPreferredSize(new java.awt.Dimension(450, 360));
+
+        javax.swing.GroupLayout panelCamLayout = new javax.swing.GroupLayout(panelCam);
+        panelCam.setLayout(panelCamLayout);
+        panelCamLayout.setHorizontalGroup(
+            panelCamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        panelCamLayout.setVerticalGroup(
+            panelCamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
 
         panHuellas.setBackground(new java.awt.Color(255, 191, 191));
         panHuellas.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Huella Digital Capturada", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION));
@@ -172,33 +406,56 @@ public class ProcesarHuella extends javax.swing.JFrame {
             }
         });
 
+        btStart.setText("iniciar");
+        btStart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btStartActionPerformed(evt);
+            }
+        });
+
+        btCapture.setText("capturar");
+        btCapture.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btCaptureActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnVerificar, javax.swing.GroupLayout.DEFAULT_SIZE, 111, Short.MAX_VALUE)
-                    .addComponent(btnIdentificar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(28, 28, 28)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnSalir, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(13, Short.MAX_VALUE))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(btnVerificar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnIdentificar, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnGuardar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnSalir))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(btStart)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btCapture)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                 .addGap(11, 11, 11)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnVerificar, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(btnVerificar, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnGuardar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnIdentificar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnSalir, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnSalir, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnIdentificar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btStart)
+                    .addComponent(btCapture))
+                .addGap(71, 71, 71))
         );
 
         panBtns.add(jPanel3, java.awt.BorderLayout.NORTH);
@@ -220,19 +477,24 @@ public class ProcesarHuella extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(panHuellas, javax.swing.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE)
-                    .addComponent(panBtns, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(panBtns, javax.swing.GroupLayout.DEFAULT_SIZE, 671, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(panHuellas, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(panelCam, javax.swing.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panHuellas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panBtns, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(panHuellas, javax.swing.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE)
+                    .addComponent(panelCam, javax.swing.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(panBtns, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         pack();
@@ -244,7 +506,7 @@ public class ProcesarHuella extends javax.swing.JFrame {
 
     private void btnVerificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerificarActionPerformed
         String nombre = JOptionPane.showInputDialog("Nombre a verificar:");
-        int doc=Integer.parseInt(nombre);
+        int doc = Integer.parseInt(nombre);
         verificarHuella(doc);
         Reclutador.clear();
     }//GEN-LAST:event_btnVerificarActionPerformed
@@ -281,6 +543,39 @@ public class ProcesarHuella extends javax.swing.JFrame {
         stop();
     }//GEN-LAST:event_formWindowClosing
 
+    private void btStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btStartActionPerformed
+        // TODO add your handling code here:
+        Thread t = new Thread() {
+            @Override
+            public void run() {
+                wCamPanel.start();
+            }
+        };
+        t.setDaemon(true);
+        t.start();
+    }//GEN-LAST:event_btStartActionPerformed
+
+    private void btCaptureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btCaptureActionPerformed
+        // TODO add your handling code here:
+        BufferedImage images = new BufferedImage(450, 360, BufferedImage.TYPE_INT_RGB);
+
+        try {
+            //File file = new File(String.format("src/Images/test.jpg"));
+            String name = String.format("C:/Nueva_carpeta/foto%d.jpg", System.currentTimeMillis());
+
+            //File file = new File("C:/Nueva carpeta/test.jpg");
+            File file = new File(name);
+            enlace = name;
+            ImageIO.write(wCam.getImage(), "JPG", file);
+            images = wCam.getImage();
+            JOptionPane.showMessageDialog(this, "Guardado en: \n" + file.getAbsolutePath(), "camCap", 1);
+            System.out.println(file.getAbsolutePath());
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Hay error en: \n" + e.getMessage(), "camCap", 1);
+        }
+        mostrar(images);
+    }//GEN-LAST:event_btCaptureActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -316,28 +611,50 @@ public class ProcesarHuella extends javax.swing.JFrame {
         });
     }
 
+    /**
+     *
+     */
     public void start() {
         Lector.startCapture();
         EnviarTexto("Utilizando el Lector de Huella Dactilar ");
     }//metodo que inicia la captura
 
+    /**
+     *
+     */
     public void stop() {
         Lector.stopCapture();
         EnviarTexto("No se está usando el Lector de Huella Dactilar ");
     }//metodo que para la captura
 
+    /**
+     *
+     * @param string
+     */
     public void EnviarTexto(String string) {
         txtArea.append(string + "\n");
     }//da el mensaje en el text area
 
+    /**
+     *
+     */
     public void EstadoHuellas() {
         EnviarTexto("Muestra de Huellas Necesarias para Guardar Template " + Reclutador.getFeaturesNeeded());
     }//cuenta las capturas que se necesitan para crear la plantilla de la huella
 
+    /**
+     *
+     * @param sample
+     * @return
+     */
     public Image CrearImagenHuella(DPFPSample sample) {
         return DPFPGlobal.getSampleConversionFactory().createImage(sample);
     }
 
+    /**
+     *
+     * @param image
+     */
     public void DibujarHuella(Image image) {
         lblImagenHuella.setIcon(new ImageIcon(
                 image.getScaledInstance(lblImagenHuella.getWidth(), lblImagenHuella.getHeight(),
@@ -345,6 +662,12 @@ public class ProcesarHuella extends javax.swing.JFrame {
         repaint();
     }
 
+    /**
+     *
+     * @param sample
+     * @param purpose
+     * @return
+     */
     public DPFPFeatureSet extraerCaracteristicas(DPFPSample sample, DPFPDataPurpose purpose) {
         DPFPFeatureExtraction extractor = DPFPGlobal.getFeatureExtractionFactory().createFeatureExtraction();
         try {
@@ -354,6 +677,11 @@ public class ProcesarHuella extends javax.swing.JFrame {
         }
     }//extrae las caracteristicas de la huella
 
+    /**
+     *
+     * @param bais
+     * @return
+     */
     public byte[] read(ByteArrayInputStream bais) {
         byte[] array = new byte[bais.available()];
         try {
@@ -365,6 +693,9 @@ public class ProcesarHuella extends javax.swing.JFrame {
         return array;
     }//se intenta convertir la huella en un array de byte[]
 
+    /**
+     *
+     */
     public void guardarHuella() {
         //Obtiene los datos del template de la huella actual
         ByteArrayInputStream datosHuella = new ByteArrayInputStream(template.serialize());
@@ -415,13 +746,11 @@ public class ProcesarHuella extends javax.swing.JFrame {
             ]
         }
          */
-        
-        
         //Pregunta el nombre de la persona a la cual corresponde dicha huella
         String nombre = JOptionPane.showInputDialog("Ingrese nombre:");
         String doc = JOptionPane.showInputDialog("Ingrese numero de identificacion:");
-        int doc2=Integer.parseInt(doc);
-        
+        int doc2 = Integer.parseInt(doc);
+
         try {
             //Establece los valores para la sentencia SQL
             Connection c = con.getConnection(); //establece la conexion con la BD
@@ -445,9 +774,14 @@ public class ProcesarHuella extends javax.swing.JFrame {
             con.desconectar();
         }
         //enviando datos a php por medio de json
-        sendPost(doc2,nombre);
+        sendPost(doc2, nombre);
     }
 
+    /**
+     *
+     * @param doc2
+     * @param nombre
+     */
     public static void sendPost(int doc2, String nombre) {//queda pendiente pues no se sabe en que formato enviarle la huella digital
         //Creamos un objeto JSON
         JSONObject jsonObj = new JSONObject();
@@ -510,6 +844,8 @@ public class ProcesarHuella extends javax.swing.JFrame {
 
     /**
      * Verifica la huella digital actual contra otra en la base de datos
+     *
+     * @param doc
      */
     public void verificarHuella(int doc) {
         try {
@@ -554,6 +890,8 @@ public class ProcesarHuella extends javax.swing.JFrame {
 
     /**
      * Identifica a una persona registrada por medio de su huella digital
+     *
+     * @throws java.io.IOException
      */
     public void identificarHuella() throws IOException {
         try {
@@ -598,6 +936,9 @@ public class ProcesarHuella extends javax.swing.JFrame {
         }
     }
 
+    /**
+     *
+     */
     protected void Iniciar() {
         Lector.addDataListener(new DPFPDataAdapter() {//hilo que obtendra los datos
             @Override
@@ -662,6 +1003,10 @@ public class ProcesarHuella extends javax.swing.JFrame {
         });
     }//metodo que inicia el proceso de hilos relacionados con el sensor
 
+    /**
+     *
+     * @param sample
+     */
     public void ProcesarCaptura(DPFPSample sample) {
         // Procesar la muestra de la huella y crear un conjunto de características con el propósito de inscripción.
         featuresinscripcion = extraerCaracteristicas(sample, DPFPDataPurpose.DATA_PURPOSE_ENROLLMENT);
@@ -712,6 +1057,8 @@ public class ProcesarHuella extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btCapture;
+    private javax.swing.JButton btStart;
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnIdentificar;
     private javax.swing.JButton btnSalir;
@@ -723,14 +1070,23 @@ public class ProcesarHuella extends javax.swing.JFrame {
     private javax.swing.JLabel lblImagenHuella;
     private javax.swing.JPanel panBtns;
     private javax.swing.JPanel panHuellas;
+    private javax.swing.JPanel panelCam;
     private javax.swing.JTextArea txtArea;
     // End of variables declaration//GEN-END:variables
 
     //getters y setters de nuestra plantilla
+    /**
+     *
+     * @return
+     */
     public DPFPTemplate getTemplate() {
         return template;
     }
 
+    /**
+     *
+     * @param template
+     */
     public void setTemplate(DPFPTemplate template) {
         DPFPTemplate old = this.template;
         this.template = template;
