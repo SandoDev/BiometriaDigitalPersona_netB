@@ -19,7 +19,7 @@ public class conectarMysqlMyadmin {
     private static final String driver = "com.mysql.jdbc.Driver";
     private static final String user = "root";
     private static final String password = "";//para mi servidor localhost no configure pass
-    private static final String bdd = "huellas";
+    private static final String bdd = "biometria";
     private static final String url = "jdbc:mysql://localhost:3306/" + bdd;
 
     //metodo que retorna la conexion

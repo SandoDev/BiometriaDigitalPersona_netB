@@ -310,6 +310,67 @@ public class ProcesarHuella extends javax.swing.JFrame {
         }
     }
 
+    public void sendPost(String dato) {
+        //Creamos un objeto JSON
+        JSONObject jsonObj = new JSONObject();
+
+        //Añadimos los datos necesarios al json
+        jsonObj.put("dato_huella", dato);
+
+        //Creamos una lista para almacenar el JSON
+        List l = new LinkedList();
+        l.addAll(Arrays.asList(jsonObj));
+
+        //Generamos el String JSON
+        String jsonString = JSONValue.toJSONString(l);
+        System.out.println("JSON GENERADO:");
+        System.out.println(jsonString);
+        System.out.println("");
+
+        try {
+            //Codificar el json a URL
+            jsonString = URLEncoder.encode(jsonString, "UTF-8");
+            //Generar la URL
+            String url = SERVER_PATH + "createUser.php";
+            //Creamos un nuevo objeto URL con la url donde queremos enviar el JSON
+            URL obj = new URL(url);
+            //Creamos un objeto de conexión
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+            //Añadimos la cabecera
+            con.setRequestMethod("POST");
+            con.setRequestProperty("User-Agent", USER_AGENT);
+            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+            //Creamos los parametros para enviar
+            String urlParameters = "json=" + jsonString;
+            // Enviamos los datos por POST
+            con.setDoOutput(true);
+            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+            wr.writeBytes(urlParameters);
+            wr.flush();
+            wr.close();
+            //Capturamos la respuesta del servidor
+            int responseCode = con.getResponseCode();
+            System.out.println("\nSending 'POST' request to URL : " + url);
+            System.out.println("Post parameters : " + urlParameters);
+            System.out.println("Response Code : " + responseCode);
+
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            //Mostramos la respuesta del servidor por consola
+            System.out.println(response);
+            //cerramos la conexión
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -509,12 +570,16 @@ public class ProcesarHuella extends javax.swing.JFrame {
         int doc = Integer.parseInt(nombre);
         verificarHuella(doc);
         Reclutador.clear();
+        lblImagenHuella.setIcon(null);
+        start();
     }//GEN-LAST:event_btnVerificarActionPerformed
 
     private void btnIdentificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIdentificarActionPerformed
         try {
             identificarHuella();
             Reclutador.clear();
+            lblImagenHuella.setIcon(null);
+            start();
         } catch (IOException ex) {
             Logger.getLogger(CapturaHuella.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -747,34 +812,39 @@ public class ProcesarHuella extends javax.swing.JFrame {
         }
          */
         //Pregunta el nombre de la persona a la cual corresponde dicha huella
-        String nombre = JOptionPane.showInputDialog("Ingrese nombre:");
         String doc = JOptionPane.showInputDialog("Ingrese numero de identificacion:");
         int doc2 = Integer.parseInt(doc);
 
         try {
             //Establece los valores para la sentencia SQL
             Connection c = con.getConnection(); //establece la conexion con la BD
+
+            //$sql = "update usuarios set  nombre='".$nombre ."' where doc=".$doc;//esta sentencia  se debe hacer en las siguientes tres lineas de insercion de datos
             //realiza la insercion de los datos
-            PreparedStatement guardarStmt = c.prepareStatement("INSERT INTO usuarios(doc,huella) values(?,?)");
-            guardarStmt.setInt(1, doc2);
-            guardarStmt.setBinaryStream(2, datosHuella, tamañoHuella);
-            //Ejecuta la sentencia
+            PreparedStatement guardarStmt = c.prepareStatement("update usuario set huella=? where documento=" + doc2);
+            guardarStmt.setBinaryStream(1, datosHuella, tamañoHuella);
+
+            //Ejecuta la sentenciax
             guardarStmt.execute();
             System.out.println("ejecutada la sentencia la sentencia");
 
             guardarStmt.close();
-            JOptionPane.showMessageDialog(null, "Huella Guardada Correctamente");
+            //JOptionPane.showMessageDialog(null, "Huella Guardada Correctamente");
+            String link = "http://localhost/BiometriaDigitalPerson/BiometriaDigitalPersonan_php/gestorHuella/createUser.php?huella=huella-guardada-correctamente";
+            llamarPHP(link);
+            sendPost("huella guardada correctamente");
+
             con.desconectar();
             btnGuardar.setEnabled(false);
             btnVerificar.grabFocus();
         } catch (SQLException ex) {
             //Si ocurre un error lo indica en la consola
-            System.err.println("Error al guardar los datos de la huella.");
+            System.err.println("Error al guardar los datos en la bdd");
         } finally {
             con.desconectar();
         }
         //enviando datos a php por medio de json
-        sendPost(doc2, nombre);
+        //sendPost(doc2, nombre);
     }
 
     /**
@@ -852,7 +922,7 @@ public class ProcesarHuella extends javax.swing.JFrame {
             //Establece los valores para la sentencia SQL
             Connection c = con.getConnection();
             //Obtiene la plantilla correspondiente a la persona indicada
-            PreparedStatement verificarStmt = c.prepareStatement("SELECT huella FROM usuarios WHERE doc=?");
+            PreparedStatement verificarStmt = c.prepareStatement("SELECT huella,nombre FROM usuario WHERE documento=?");
             verificarStmt.setInt(1, doc);
             ResultSet rs = verificarStmt.executeQuery();
 
@@ -860,6 +930,8 @@ public class ProcesarHuella extends javax.swing.JFrame {
             if (rs.next()) {
                 //Lee la plantilla de la base de datos
                 byte templateBuffer[] = rs.getBytes("huella");
+                String nombre = rs.getString("nombre");
+
                 //Crea una nueva plantilla a partir de la guardada en la base de datos
                 DPFPTemplate referenceTemplate = DPFPGlobal.getTemplateFactory().createTemplate(templateBuffer);
                 //Envia la plantilla creada al objeto contendor de Template del componente de huella digital
@@ -871,9 +943,9 @@ public class ProcesarHuella extends javax.swing.JFrame {
 
                 //compara las plantilas (actual vs bd)
                 if (result.isVerified()) {
-                    JOptionPane.showMessageDialog(null, "Las huella capturada coinciden con la de " + doc, "Verificacion de Huella", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Las huella capturada coinciden con la de " + nombre, "Verificacion de Huella", JOptionPane.INFORMATION_MESSAGE);
                 } else {
-                    JOptionPane.showMessageDialog(null, "No corresponde la huella con " + doc, "Verificacion de Huella", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "No corresponde la huella con " + nombre, "Verificacion de Huella", JOptionPane.ERROR_MESSAGE);
                 }
 
                 //Si no encuentra alguna huella correspondiente al nombre lo indica con un mensaje
@@ -889,7 +961,8 @@ public class ProcesarHuella extends javax.swing.JFrame {
     }
 
     /**
-     * Identifica a una persona registrada por medio de su huella digital
+     * Identifica a una persona registrada por medio de su huella digital para
+     * que funcione efectivamente no debe haber huellas repetidas
      *
      * @throws java.io.IOException
      */
@@ -899,7 +972,7 @@ public class ProcesarHuella extends javax.swing.JFrame {
             Connection c = con.getConnection();
 
             //Obtiene todas las huellas de la bd
-            PreparedStatement identificarStmt = c.prepareStatement("SELECT nombre,huella FROM usuarios");
+            PreparedStatement identificarStmt = c.prepareStatement("SELECT nombre,huella FROM usuario");
             ResultSet rs = identificarStmt.executeQuery();
 
             //Si se encuentra el nombre en la base de datos
