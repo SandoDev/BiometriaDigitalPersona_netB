@@ -165,12 +165,11 @@
                               <Component id="btnIdentificar" min="-2" pref="99" max="-2" attributes="1"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnGuardar" min="-2" max="-2" attributes="1"/>
-                              <EmptySpace max="32767" attributes="0"/>
+                              <EmptySpace pref="303" max="32767" attributes="0"/>
                               <Component id="btnSalir" min="-2" max="-2" attributes="1"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="btStart" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="75" max="-2" attributes="0"/>
                               <Component id="btCapture" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
@@ -190,10 +189,7 @@
                           <Component id="btnSalir" alignment="3" max="32767" attributes="1"/>
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="btStart" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="btCapture" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
+                      <Component id="btCapture" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="71" max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -233,14 +229,6 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnGuardarActionPerformed"/>
-              </Events>
-            </Component>
-            <Component class="javax.swing.JButton" name="btStart">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="iniciar"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btStartActionPerformed"/>
               </Events>
             </Component>
             <Component class="javax.swing.JButton" name="btCapture">
