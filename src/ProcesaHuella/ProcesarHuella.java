@@ -179,17 +179,6 @@ public class ProcesarHuella extends javax.swing.JFrame {
         txt_nom.setText(String.valueOf(usuarioCod));
         System.out.println("Tomando la foto");
 
-        //images=w.getImage();
-        btnGuardar.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String nom = txt_nom.getText();
-                String link = "http://localhost/BiometriaDigitalPerson/BiometriaDigitalPersonan_php/gestorHuella/moduloPrestamo.php?user=" + nom;
-                llamarPHP(link);
-                sendPost(nom, enlace);
-
-            }
-        });
-
         //w.close();
         System.out.println("play");
 
@@ -203,14 +192,23 @@ public class ProcesarHuella extends javax.swing.JFrame {
         f.add(user);
         f.add(panel);
         f.pack();
-        f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        f.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         f.setVisible(true);
         btnBorrar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 f.setVisible(false);
                 File fichero = new File(enlace);
                 eliminarFichero(fichero);
-
+            }
+        });
+        
+        btnGuardar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String nom = txt_nom.getText();
+                String link = "http://localhost/BiometriaDigitalPerson/BiometriaDigitalPersonan_php/gestorHuella/moduloPrestamo.php?user=" + nom;
+                llamarPHP(link);
+                sendPost(nom, enlace);
+                f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             }
         });
     }
