@@ -27,8 +27,6 @@ import com.digitalpersona.onetouch.verification.DPFPVerificationResult;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamPanel;
 import com.github.sarxos.webcam.WebcamResolution;
-import formularios.CapturaHuella;
-import static formularios.CapturaHuella.TEMPLATE_PROPERTY;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -68,6 +66,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
@@ -122,6 +121,8 @@ public class ProcesarHuella extends javax.swing.JFrame {
     // o verificarla con alguna guardada en la BD
     private DPFPVerification Verificador = DPFPGlobal.getVerificationFactory().createVerification();
 
+    public static String TEMPLATE_PROPERTY = "template";
+
     /**
      * Creates new form ProcesarHuella
      */
@@ -132,6 +133,7 @@ public class ProcesarHuella extends javax.swing.JFrame {
         wCamPanel.setFillArea(true);
         panelCam.setLayout(new FlowLayout());
         panelCam.add(wCamPanel);
+        txtArea.setEditable(false);
     }
 
     private static final class PlayerPanel extends JPanel {
@@ -164,13 +166,13 @@ public class ProcesarHuella extends javax.swing.JFrame {
 
         JButton btnGuardar, btnBorrar;
         JTextField txt_nom;
-        JLabel user=new JLabel();
+        JLabel user = new JLabel();
         user.setText("Documento user");
         txt_nom = new JTextField();
         txt_nom.setBounds(670, 90, 100, 30);
         user.setBounds(670, 50, 100, 30);
         btnBorrar = new JButton("Tomar otra");
-        btnGuardar = new JButton("Guardar");
+        btnGuardar = new JButton("Prestar");
         btnGuardar.setBounds(670, 150, 100, 40);
         btnBorrar.setBounds(670, 300, 100, 40);
 
@@ -201,14 +203,13 @@ public class ProcesarHuella extends javax.swing.JFrame {
                 eliminarFichero(fichero);
             }
         });
-        
+
         btnGuardar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String nom = txt_nom.getText();
                 String link = "http://localhost/BiometriaDigitalPerson/BiometriaDigitalPersonan_php/gestorHuella/moduloPrestamo.php?user=" + nom;
                 llamarPHP(link);
                 sendPost(nom, enlace);
-                f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             }
         });
     }
@@ -397,6 +398,9 @@ public class ProcesarHuella extends javax.swing.JFrame {
         btnIdentificar = new javax.swing.JButton();
         btnGuardar = new javax.swing.JButton();
         btCapture = new javax.swing.JButton();
+        terminaPrestamo = new javax.swing.JToggleButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tablaPrestamo = new javax.swing.JTable();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtArea = new javax.swing.JTextArea();
@@ -419,7 +423,7 @@ public class ProcesarHuella extends javax.swing.JFrame {
         panelCam.setLayout(panelCamLayout);
         panelCamLayout.setHorizontalGroup(
             panelCamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 447, Short.MAX_VALUE)
         );
         panelCamLayout.setVerticalGroup(
             panelCamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -479,6 +483,34 @@ public class ProcesarHuella extends javax.swing.JFrame {
             }
         });
 
+        terminaPrestamo.setText("Terminar prestamo");
+        terminaPrestamo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                terminaPrestamoActionPerformed(evt);
+            }
+        });
+
+        tablaPrestamo.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null}
+            },
+            new String [] {
+                "Estado", "Equipo"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane2.setViewportView(tablaPrestamo);
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -488,16 +520,18 @@ public class ProcesarHuella extends javax.swing.JFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(btnVerificar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnIdentificar, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnGuardar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 303, Short.MAX_VALUE)
-                        .addComponent(btnSalir))
+                        .addGap(18, 18, 18)
+                        .addComponent(btnIdentificar, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(75, 75, 75)
                         .addComponent(btCapture)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(18, 18, 18)
+                        .addComponent(terminaPrestamo)))
+                .addGap(27, 27, 27)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnSalir)
+                    .addComponent(btnGuardar))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 87, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -507,11 +541,16 @@ public class ProcesarHuella extends javax.swing.JFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnVerificar, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnGuardar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnIdentificar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnSalir, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnIdentificar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btCapture)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btCapture)
+                    .addComponent(terminaPrestamo)
+                    .addComponent(btnSalir, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(71, 71, 71))
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         panBtns.add(jPanel3, java.awt.BorderLayout.NORTH);
@@ -533,24 +572,24 @@ public class ProcesarHuella extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(panBtns, javax.swing.GroupLayout.DEFAULT_SIZE, 671, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(panBtns, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(panHuellas, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(panelCam, javax.swing.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)))
-                .addContainerGap())
+                        .addComponent(panelCam, javax.swing.GroupLayout.PREFERRED_SIZE, 447, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(panHuellas, javax.swing.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE)
-                    .addComponent(panelCam, javax.swing.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
+                    .addComponent(panelCam, javax.swing.GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE)
+                    .addComponent(panHuellas, javax.swing.GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(panBtns, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -576,7 +615,7 @@ public class ProcesarHuella extends javax.swing.JFrame {
             lblImagenHuella.setIcon(null);
             start();
         } catch (IOException ex) {
-            Logger.getLogger(CapturaHuella.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(ProcesaHuella.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnIdentificarActionPerformed
 
@@ -597,6 +636,7 @@ public class ProcesarHuella extends javax.swing.JFrame {
         btnIdentificar.setEnabled(false);
         btnVerificar.setEnabled(false);
         btCapture.setEnabled(false);
+        terminaPrestamo.setEnabled(false);
         btnSalir.grabFocus();
     }//GEN-LAST:event_formWindowOpened
 
@@ -625,6 +665,11 @@ public class ProcesarHuella extends javax.swing.JFrame {
         }
         mostrar(images);
     }//GEN-LAST:event_btCaptureActionPerformed
+
+    private void terminaPrestamoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_terminaPrestamoActionPerformed
+        // TODO add your handling code here:
+
+    }//GEN-LAST:event_terminaPrestamoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -884,7 +929,6 @@ public class ProcesarHuella extends javax.swing.JFrame {
                 //Lee la plantilla de la base de datos
                 byte templateBuffer[] = rs.getBytes("huella");
                 String nombre = rs.getString("nombre");
-                usuarioCod = doc;
                 //Crea una nueva plantilla a partir de la guardada en la base de datos
                 DPFPTemplate referenceTemplate = DPFPGlobal.getTemplateFactory().createTemplate(templateBuffer);
                 //Envia la plantilla creada al objeto contendor de Template del componente de huella digital
@@ -894,10 +938,33 @@ public class ProcesarHuella extends javax.swing.JFrame {
                 // plantilla guardada al usuario especifico en la base de datos
                 DPFPVerificationResult result = Verificador.verify(featuresverificacion, getTemplate());
 
-                //compara las plantilas (actual vs bd)
                 if (result.isVerified()) {
                     JOptionPane.showMessageDialog(null, "Las huella capturada coinciden con la de " + nombre, "Verificacion de Huella", JOptionPane.INFORMATION_MESSAGE);
                     btCapture.setEnabled(true);
+                    usuarioCod = doc;
+
+                    String Consultasql = "SELECT equipo.estado,prestamo.equipo "
+                            + "FROM prestamo INNER JOIN equipo ON prestamo.equipo = equipo.serial "
+                            + "where prestamo.usuario=?";
+                    PreparedStatement verificarStmt1 = c.prepareStatement(Consultasql);
+                    verificarStmt1.setInt(1, doc);
+                    ResultSet rs1 = verificarStmt1.executeQuery();
+                    DefaultTableModel modelo = new DefaultTableModel();
+                    modelo.addColumn("Estado");
+                    modelo.addColumn("Equipo");
+                    while (rs1.next()) {
+                        int estado = rs1.getInt("estado");
+                        String serial = rs1.getString("equipo");
+                        Object[] fila = new Object[2];
+                        fila[0] = estado;
+                        fila[1] = serial;
+                        modelo.addRow(fila);
+                        if (estado == 1) {
+                            terminaPrestamo.setEnabled(true);
+                        }
+                    }
+                    tablaPrestamo.setModel(modelo);
+
                 } else {
                     JOptionPane.showMessageDialog(null, "No corresponde la huella con " + nombre, "Verificacion de Huella", JOptionPane.ERROR_MESSAGE);
                 }
@@ -950,8 +1017,30 @@ public class ProcesarHuella extends javax.swing.JFrame {
                 if (result.isVerified()) {
                     //crea la imagen de los datos guardado de las huellas guardadas en la base de datos
                     JOptionPane.showMessageDialog(null, "Las huella capturada es de " + nombre, "Verificacion de Huella", JOptionPane.INFORMATION_MESSAGE);
-                    usuarioCod = doc;
                     btCapture.setEnabled(true);
+                    usuarioCod = doc;
+
+                    String Consultasql = "SELECT equipo.estado,prestamo.equipo "
+                            + "FROM prestamo INNER JOIN equipo ON prestamo.equipo = equipo.serial "
+                            + "where prestamo.usuario=?";
+                    PreparedStatement verificarStmt1 = c.prepareStatement(Consultasql);
+                    verificarStmt1.setInt(1, doc);
+                    ResultSet rs1 = verificarStmt1.executeQuery();
+                    DefaultTableModel modelo = new DefaultTableModel();
+                    modelo.addColumn("Estado");
+                    modelo.addColumn("Equipo");
+                    while (rs1.next()) {
+                        int estado = rs1.getInt("estado");
+                        String serial = rs1.getString("equipo");
+                        Object[] fila = new Object[2];
+                        fila[0] = estado;
+                        fila[1] = serial;
+                        modelo.addRow(fila);
+                        if (estado == 1) {
+                            terminaPrestamo.setEnabled(true);
+                        }
+                    }
+                    tablaPrestamo.setModel(modelo);
                     return;
                 }
             }
@@ -1093,10 +1182,13 @@ public class ProcesarHuella extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lblImagenHuella;
     private javax.swing.JPanel panBtns;
     private javax.swing.JPanel panHuellas;
     private javax.swing.JPanel panelCam;
+    private javax.swing.JTable tablaPrestamo;
+    private javax.swing.JToggleButton terminaPrestamo;
     private javax.swing.JTextArea txtArea;
     // End of variables declaration//GEN-END:variables
 
