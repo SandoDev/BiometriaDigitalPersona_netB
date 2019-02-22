@@ -993,22 +993,24 @@ public class ProcesarHuella extends javax.swing.JFrame {
             Connection c = con.getConnection();
 
             //Obtiene todas las huellas de la bd
-            PreparedStatement identificarStmt = c.prepareStatement("SELECT nombre,documento,huella FROM usuario");
+            PreparedStatement identificarStmt = c.prepareStatement("SELECT huella,nombre,documento FROM usuario");
             ResultSet rs = identificarStmt.executeQuery();
 
             //Si se encuentra el nombre en la base de datos
             while (rs.next()) {
                 //Lee la plantilla de la base de datos
-                byte templateBuffer[] = rs.getBytes("huella");
                 String nombre = rs.getString("nombre");
                 int doc = rs.getInt("documento");
+
+                byte templateBuffer[] = rs.getBytes("huella");
+
                 //Crea una nueva plantilla a partir de la guardada en la base de datos
                 DPFPTemplate referenceTemplate = DPFPGlobal.getTemplateFactory().createTemplate(templateBuffer);
                 //Envia la plantilla creada al objeto contendor de Template del componente de huella digital
                 setTemplate(referenceTemplate);
 
                 // Compara las caracteriticas de la huella recientemente capturda con la
-                // alguna plantilla guardada en la base de datos que coincide con ese tipo
+                // plantilla guardada al usuario especifico en la base de datos
                 DPFPVerificationResult result = Verificador.verify(featuresverificacion, getTemplate());
 
                 //compara las plantilas (actual vs bd)
@@ -1017,6 +1019,7 @@ public class ProcesarHuella extends javax.swing.JFrame {
                 if (result.isVerified()) {
                     //crea la imagen de los datos guardado de las huellas guardadas en la base de datos
                     JOptionPane.showMessageDialog(null, "Las huella capturada es de " + nombre, "Verificacion de Huella", JOptionPane.INFORMATION_MESSAGE);
+
                     btCapture.setEnabled(true);
                     usuarioCod = doc;
 
@@ -1041,6 +1044,7 @@ public class ProcesarHuella extends javax.swing.JFrame {
                         }
                     }
                     tablaPrestamo.setModel(modelo);
+
                     return;
                 }
             }
