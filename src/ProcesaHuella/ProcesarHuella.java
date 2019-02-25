@@ -615,7 +615,7 @@ public class ProcesarHuella extends javax.swing.JFrame {
             lblImagenHuella.setIcon(null);
             start();
         } catch (IOException ex) {
-            //Logger.getLogger(ProcesaHuella.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ProcesarHuella.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnIdentificarActionPerformed
 
@@ -993,7 +993,7 @@ public class ProcesarHuella extends javax.swing.JFrame {
             Connection c = con.getConnection();
 
             //Obtiene todas las huellas de la bd
-            PreparedStatement identificarStmt = c.prepareStatement("SELECT huella,nombre,documento FROM usuario");
+            PreparedStatement identificarStmt = c.prepareStatement("SELECT nombre,documento,huella FROM usuario");
             ResultSet rs = identificarStmt.executeQuery();
 
             //Si se encuentra el nombre en la base de datos
@@ -1001,7 +1001,6 @@ public class ProcesarHuella extends javax.swing.JFrame {
                 //Lee la plantilla de la base de datos
                 String nombre = rs.getString("nombre");
                 int doc = rs.getInt("documento");
-
                 byte templateBuffer[] = rs.getBytes("huella");
 
                 //Crea una nueva plantilla a partir de la guardada en la base de datos
