@@ -209,7 +209,7 @@ public class ProcesarHuella extends javax.swing.JFrame {
                 String nom = txt_nom.getText();
                 String link = "http://localhost/BiometriaDigitalPerson/BiometriaDigitalPersonan_php/gestorHuella/moduloPrestamo.php?user=" + nom;
                 llamarPHP(link);
-                sendPost(nom, enlace);
+                //sendPost(nom, enlace);
             }
         });
     }
@@ -317,12 +317,13 @@ public class ProcesarHuella extends javax.swing.JFrame {
         }
     }
 
-    public void sendPost(String dato) {
+    public void sendPost(int usuario, String dato, String formulario) {
         //Creamos un objeto JSON
         JSONObject jsonObj = new JSONObject();
 
         //Añadimos los datos necesarios al json
         jsonObj.put("dato_huella", dato);
+        jsonObj.put("usuario", usuario);
 
         //Creamos una lista para almacenar el JSON
         List l = new LinkedList();
@@ -338,7 +339,7 @@ public class ProcesarHuella extends javax.swing.JFrame {
             //Codificar el json a URL
             jsonString = URLEncoder.encode(jsonString, "UTF-8");
             //Generar la URL
-            String url = SERVER_PATH + "createUser.php";
+            String url = SERVER_PATH + formulario;
             //Creamos un nuevo objeto URL con la url donde queremos enviar el JSON
             URL obj = new URL(url);
             //Creamos un objeto de conexión
@@ -668,7 +669,9 @@ public class ProcesarHuella extends javax.swing.JFrame {
 
     private void terminaPrestamoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_terminaPrestamoActionPerformed
         // TODO add your handling code here:
-
+        String link = "http://localhost/BiometriaDigitalPerson/BiometriaDigitalPersonan_php/gestorHuella/moduloTerminaPrestamo.php?user="+this.usuarioCod;
+        llamarPHP(link);
+        //sendPost(this.usuarioCod, "hola", "terminarPrestamo.php");
     }//GEN-LAST:event_terminaPrestamoActionPerformed
 
     /**
@@ -828,7 +831,7 @@ public class ProcesarHuella extends javax.swing.JFrame {
             //JOptionPane.showMessageDialog(null, "Huella Guardada Correctamente");
             String link = "http://localhost/BiometriaDigitalPerson/BiometriaDigitalPersonan_php/gestorHuella/createUser.php?huella=huella-guardada-correctamente";
             llamarPHP(link);
-            sendPost("huella guardada correctamente");
+            //sendPost(this.usuarioCod,"huella guardada correctamente","createUser.php");
             btCapture.setEnabled(true);
 
             con.desconectar();
@@ -841,75 +844,8 @@ public class ProcesarHuella extends javax.swing.JFrame {
         } finally {
             con.desconectar();
         }
-        //enviando datos a php por medio de json
-        //sendPost(doc2, nombre);
     }
-
-    /**
-     *
-     * @param doc2
-     * @param nombre
-     */
-    public static void sendPost(int doc2, String nombre) {//queda pendiente pues no se sabe en que formato enviarle la huella digital
-        //Creamos un objeto JSON
-        JSONObject jsonObj = new JSONObject();
-        //Añadimos el nombre, huella a json
-        jsonObj.put("doc", doc2);
-        jsonObj.put("nombre", nombre);
-
-        //Creamos una lista para almacenar el JSON
-        List l = new LinkedList();
-        l.addAll(Arrays.asList(jsonObj));
-        //Generamos el String JSON
-        String jsonString = JSONValue.toJSONString(l);
-        System.out.println("JSON GENERADO:");
-        System.out.println(jsonString);
-        System.out.println("");
-
-        try {
-            //Codificar el json a URL
-            jsonString = URLEncoder.encode(jsonString, "UTF-8");
-            //Generar la URL
-            String url = SERVER_PATH + "listenPost.php";
-            //Creamos un nuevo objeto URL con la url donde queremos enviar el JSON
-            URL obj = new URL(url);
-            //Creamos un objeto de conexión
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-            //Añadimos la cabecera
-            con.setRequestMethod("POST");
-            //con.setRequestProperty("User-Agent", USER_AGENT);
-            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-            //Creamos los parametros para enviar
-            String urlParameters = "json=" + jsonString;
-            // Enviamos los datos por POST
-            con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(urlParameters);
-            wr.flush();
-            wr.close();
-            //Capturamos la respuesta del servidor
-            int responseCode = con.getResponseCode();
-            System.out.println("\nSending 'POST' request to URL : " + url);
-            System.out.println("Post parameters : " + urlParameters);
-            System.out.println("Response Code : " + responseCode);
-
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine + "\n");
-            }
-            //Mostramos la respuesta del servidor por consola
-            System.out.println(response);
-            //cerramos la conexión
-            in.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
+    
     /**
      * Verifica la huella digital actual contra otra en la base de datos
      *
@@ -943,6 +879,7 @@ public class ProcesarHuella extends javax.swing.JFrame {
                     btCapture.setEnabled(true);
                     usuarioCod = doc;
 
+                    //modificar consulta para que solo me muestre los prestamos activos del usuario
                     String Consultasql = "SELECT equipo.estado,prestamo.equipo "
                             + "FROM prestamo INNER JOIN equipo ON prestamo.equipo = equipo.serial "
                             + "where prestamo.usuario=?";
@@ -1004,6 +941,7 @@ public class ProcesarHuella extends javax.swing.JFrame {
                 byte templateBuffer[] = rs.getBytes("huella");
 
                 //Crea una nueva plantilla a partir de la guardada en la base de datos
+                //si no llega a funcionar el boton identificar en un debido momento es que porque hay huellas repetidas en la base de datos
                 DPFPTemplate referenceTemplate = DPFPGlobal.getTemplateFactory().createTemplate(templateBuffer);
                 //Envia la plantilla creada al objeto contendor de Template del componente de huella digital
                 setTemplate(referenceTemplate);
