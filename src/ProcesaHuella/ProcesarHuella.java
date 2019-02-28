@@ -880,9 +880,7 @@ public class ProcesarHuella extends javax.swing.JFrame {
                     usuarioCod = doc;
 
                     //modificar consulta para que solo me muestre los prestamos activos del usuario
-                    String Consultasql = "SELECT equipo.estado,prestamo.equipo "
-                            + "FROM prestamo INNER JOIN equipo ON prestamo.equipo = equipo.serial "
-                            + "where prestamo.usuario=?";
+                    String Consultasql = "SELECT prestamo.equipo FROM prestamo INNER JOIN equipo on prestamo.equipo=equipo.serial WHERE equipo.estado=1 AND prestamo.usuario=?";
                     PreparedStatement verificarStmt1 = c.prepareStatement(Consultasql);
                     verificarStmt1.setInt(1, doc);
                     ResultSet rs1 = verificarStmt1.executeQuery();
@@ -960,9 +958,7 @@ public class ProcesarHuella extends javax.swing.JFrame {
                     btCapture.setEnabled(true);
                     usuarioCod = doc;
 
-                    String Consultasql = "SELECT equipo.estado,prestamo.equipo "
-                            + "FROM prestamo INNER JOIN equipo ON prestamo.equipo = equipo.serial "
-                            + "where prestamo.usuario=?";
+                    String Consultasql = "SELECT prestamo.equipo FROM prestamo INNER JOIN equipo on prestamo.equipo=equipo.serial WHERE equipo.estado=1 AND prestamo.usuario=?";
                     PreparedStatement verificarStmt1 = c.prepareStatement(Consultasql);
                     verificarStmt1.setInt(1, doc);
                     ResultSet rs1 = verificarStmt1.executeQuery();
