@@ -18,7 +18,7 @@ Dactilar Digital Persona 4500 is a desktop application to manage fingerprint rea
 
 - [Json Simple 1.1](http://www.java2s.com/Code/Jar/j/Downloadjsonsimple11jar.htm)
 - [Webcam Capture 0.3.12](https://github.com/sarxos/webcam-capture/releases)
-- [MySQL Connector / J 5.1.23](https://cdn.mysql.com/archives/mysql-connector-java-5.1/mysql-connector-java-5.1.23.zip)
+- [MySQL Connector / J 5.1.49](https://dev.mysql.com/downloads/connector/j/5.1.html)
 
   *One Touch for Windows SDK [(Link Suggested)](https://github.com/Eliezer090/JavaLibsPersonal/blob/master/JavaLibs.rar):*
 
