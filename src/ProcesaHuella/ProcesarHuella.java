@@ -78,9 +78,9 @@ public class ProcesarHuella extends javax.swing.JFrame {
 
     private int usuarioCod = 0;
     private Dimension ds = new Dimension(450, 360);
-    private Dimension cs = WebcamResolution.VGA.getSize();
-    private Webcam wCam = Webcam.getDefault();
-    private WebcamPanel wCamPanel = new WebcamPanel(wCam, ds, false);
+//    private Dimension cs = WebcamResolution.VGA.getSize();
+//    private Webcam wCam = Webcam.getDefault();
+//    private WebcamPanel wCamPanel = new WebcamPanel(wCam, ds, false);
     FileInputStream myStream;
     byte[] imageInBytes;
     private static final String USER_AGENT = "Mozilla/5.0";
@@ -129,10 +129,10 @@ public class ProcesarHuella extends javax.swing.JFrame {
     public ProcesarHuella() {
         initComponents();
         this.setLocationRelativeTo(null);//aparece en medio de la pantalla
-        wCam.setViewSize(cs);
-        wCamPanel.setFillArea(true);
-        panelCam.setLayout(new FlowLayout());
-        panelCam.add(wCamPanel);
+//        wCam.setViewSize(cs);
+//        wCamPanel.setFillArea(true);
+//        panelCam.setLayout(new FlowLayout());
+//        panelCam.add(wCamPanel);
         txtArea.setEditable(false);
     }
 
@@ -650,20 +650,20 @@ public class ProcesarHuella extends javax.swing.JFrame {
         // TODO add your handling code here:
         BufferedImage images = new BufferedImage(450, 360, BufferedImage.TYPE_INT_RGB);
 
-        try {
+//        try {
             //File file = new File(String.format("src/Images/test.jpg"));
             String name = String.format("C:/Nueva_carpeta/foto%d.jpg", System.currentTimeMillis());
 
             //File file = new File("C:/Nueva carpeta/test.jpg");
             File file = new File(name);
             enlace = name;
-            ImageIO.write(wCam.getImage(), "JPG", file);
-            images = wCam.getImage();
+//            ImageIO.write(wCam.getImage(), "JPG", file);
+//            images = wCam.getImage();
             JOptionPane.showMessageDialog(this, "Guardado en: \n" + file.getAbsolutePath(), "camCap", 1);
             System.out.println(file.getAbsolutePath());
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Hay error en: \n" + e.getMessage(), "camCap", 1);
-        }
+//        } catch (IOException e) {
+//            JOptionPane.showMessageDialog(this, "Hay error en: \n" + e.getMessage(), "camCap", 1);
+//        }
         mostrar(images);
     }//GEN-LAST:event_btCaptureActionPerformed
 
@@ -714,7 +714,7 @@ public class ProcesarHuella extends javax.swing.JFrame {
         Thread t = new Thread() {
             @Override
             public void run() {
-                wCamPanel.start();
+//                wCamPanel.start();
             }
         };
         t.setDaemon(true);
@@ -820,7 +820,7 @@ public class ProcesarHuella extends javax.swing.JFrame {
 
             //$sql = "update usuarios set  nombre='".$nombre ."' where doc=".$doc;//esta sentencia  se debe hacer en las siguientes tres lineas de insercion de datos
             //realiza la insercion de los datos
-            PreparedStatement guardarStmt = c.prepareStatement("update usuario set huella=? where documento=" + doc2);
+            PreparedStatement guardarStmt = c.prepareStatement("update student set fingerprint=? where identification=" + doc2);
             guardarStmt.setBinaryStream(1, datosHuella, tamañoHuella);
 
             //Ejecuta la sentenciax
@@ -856,15 +856,15 @@ public class ProcesarHuella extends javax.swing.JFrame {
             //Establece los valores para la sentencia SQL
             Connection c = con.getConnection();
             //Obtiene la plantilla correspondiente a la persona indicada
-            PreparedStatement verificarStmt = c.prepareStatement("SELECT huella,nombre FROM usuario WHERE documento=?");
+            PreparedStatement verificarStmt = c.prepareStatement("SELECT fingerprint,name FROM student WHERE identification=?");
             verificarStmt.setInt(1, doc);
             ResultSet rs = verificarStmt.executeQuery();
 
             //Si se encuentra el nombre en la base de datos
             if (rs.next()) {
                 //Lee la plantilla de la base de datos
-                byte templateBuffer[] = rs.getBytes("huella");
-                String nombre = rs.getString("nombre");
+                byte templateBuffer[] = rs.getBytes("fingerprint");
+                String nombre = rs.getString("name");
                 //Crea una nueva plantilla a partir de la guardada en la base de datos
                 DPFPTemplate referenceTemplate = DPFPGlobal.getTemplateFactory().createTemplate(templateBuffer);
                 //Envia la plantilla creada al objeto contendor de Template del componente de huella digital
