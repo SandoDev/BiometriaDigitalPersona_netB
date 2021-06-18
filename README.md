@@ -43,3 +43,11 @@ Dactilar Digital Persona 4500 is a desktop application to manage fingerprint rea
 
 by [ITI](http://itiud.org) research group of [Universidad Distrital Francisco José de Caldas](https://www.udistrital.edu.co/en/index)
 
+
+# To install in ubuntu:
+
+- (Check) https://github.com/tadryanom/DigitalPersona-UareU-SDK-to-FreePascal
+- Download drivers in ubuntu from fprint-demo
+- Save jar files in java path
+
+  jar cmvf manifest.mf dist/libs/*.jar

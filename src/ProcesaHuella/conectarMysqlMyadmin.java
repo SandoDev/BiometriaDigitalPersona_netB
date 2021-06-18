@@ -15,18 +15,16 @@ import config.PropertiesFile;
  */
 public final class conectarMysqlMyadmin {
 
-    //declaracion de variables para la conexion
-    private static Connection conn;
+    // declaracion de variables para la conexion
+    private Connection conn;
     private String driver = "com.mysql.jdbc.Driver";
     private String host = "localhost";
     private String port = "3306";
     private String user = "root";
-    private String password = "";//para mi servidor localhost no configure pass
+    private String password = "";
     private String bdd = "bd";
     private String url = "jdbc:mysql://" + host + ":" + port + "/" + bdd;
     private final PropertiesFile properties;
-
-    //metodo que retorna la conexion
 
     /**
      *
@@ -40,8 +38,8 @@ public final class conectarMysqlMyadmin {
     public void configUrl() {
         this.url = "jdbc:mysql://" + this.host + ":" + this.port + "/" + this.bdd;
     }
-    
-    public conectarMysqlMyadmin(){
+
+    public conectarMysqlMyadmin() {
         this.properties = new PropertiesFile("database");
         this.host = this.properties.getProperty("server.name");
         this.port = this.properties.getProperty("port");
@@ -52,28 +50,27 @@ public final class conectarMysqlMyadmin {
     }
 
     public Connection getConnection() {
-        conn = null;
         try {
-            //se carga el driver necesario para el proceso
+            // Charging of driver
             Class.forName(driver);
-            //se conecnta finalmete a la base de datos
-            conn = DriverManager.getConnection(url, user, password);
-            if (conn != null) {
+            // Conection to database
+            this.conn = DriverManager.getConnection(url, this.user, this.password);
+            if (this.conn != null) {
                 System.out.println("Conectado a la base de datos: " + bdd);
             }
         } catch (Exception e) {
             System.out.println("Error al conectar: " + e);
         }
-        return conn;
+        return this.conn;
     }
 
-    //metodo que desconecta de la base de datos
+    // metodo que desconecta de la base de datos
 
     /**
      *
      */
     public void desconectar() {
-        conn = null;//se cierra la conexion asignado la variable a null
+        conn = null;// se cierra la conexion asignado la variable a null
         System.out.println("Desconectado de la base de datos: " + bdd);
     }
 }
