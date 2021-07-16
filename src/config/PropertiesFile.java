@@ -17,8 +17,8 @@ import java.util.Properties;
  */
 public class PropertiesFile {
     
-    public static Properties properties = null;
-    public static String propertyType = null;
+    Properties properties = null;
+    String propertyType = null;
 
     
     public PropertiesFile(String propertyType){
@@ -26,13 +26,13 @@ public class PropertiesFile {
         this.propertyType = propertyType;
     }
     
-    private static Properties getProperties(){
-        if(properties == null){
-            properties = new Properties();
+    private Properties getProperties(){
+        if(this.properties == null){
+            this.properties = new Properties();
             try{
-                String path = "src/config/"+propertyType+".properties";              
+                String path = "src/config/"+this.propertyType+".properties";              
                 InputStream in = new FileInputStream(path);
-                properties.load(in);
+                this.properties.load(in);
             } catch(FileNotFoundException e){
                 e.printStackTrace();
             } catch(IOException e){
@@ -42,7 +42,7 @@ public class PropertiesFile {
         return properties;
     }
     
-    public static String getProperty(String nameProperty){
+    public String getProperty(String nameProperty){
         return getProperties().getProperty(nameProperty);
     }
 
