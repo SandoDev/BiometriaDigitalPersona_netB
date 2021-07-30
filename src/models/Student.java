@@ -15,24 +15,24 @@ public class Student {
 
     Database con = new Database();
 
-    public ByteArrayInputStream getFingerPrintData() {
+    public ByteArrayInputStream getFingerprintData() {
         out.println(this.fingerPrintData);
         return this.fingerPrintData;
     }
 
-    public Integer getFingerPrintSize() {
+    public Integer getFingerprintSize() {
         return this.fingerPrintSize;
     }
 
-    public void setFingerPrintData(ByteArrayInputStream fingerPrintData) {
+    public void setFingerprintData(ByteArrayInputStream fingerPrintData) {
         this.fingerPrintData = fingerPrintData;
     }
 
-    public void setFingerPrintSize(Integer fingerPrintSize) {
+    public void setFingerprintSize(Integer fingerPrintSize) {
         this.fingerPrintSize = fingerPrintSize;
     }
 
-    public boolean saveFingerPrint(String doc) {
+    public boolean saveFingerprint(String doc) {
         try {
             var c = con.getConnection(); // Set up connection with DB
 
