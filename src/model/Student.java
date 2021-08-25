@@ -1,4 +1,4 @@
-package models;
+package model;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -7,6 +7,7 @@ import static java.lang.System.out;
 import static java.lang.System.err;
 
 import java.io.ByteArrayInputStream;
+import java.sql.Connection;
 
 public class Student {
 
@@ -34,7 +35,7 @@ public class Student {
 
     public boolean saveFingerprint(String doc) {
         try {
-            var c = con.getConnection(); // Set up connection with DB
+            Connection c = con.getConnection(); // Set up connection with DB
 
             String query = "update student set fingerprint=? where identification=" + doc;
             PreparedStatement preparedStatement = c.prepareStatement(query);
@@ -48,7 +49,7 @@ public class Student {
             err.println("An error ocurred saving data in bd: " + ex.getMessage());
             return false;
         } finally {
-            con.desconectar();
+            con.disconnect();
         }
     }
 

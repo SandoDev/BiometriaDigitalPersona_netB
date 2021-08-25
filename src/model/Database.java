@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package models;
+package model;
 
 import static java.lang.System.out;
 import java.sql.Connection;
@@ -57,7 +57,6 @@ public final class Database {
         try {
             // Conection to database
             this.conn = DriverManager.getConnection(url, this.user, this.password);
-            out.println("Connected to database: " + this.bdd);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "An error occured in connection: "+e);
         }
@@ -67,7 +66,7 @@ public final class Database {
     /**
      * Disconnect database
      */
-    public void desconectar() {
+    public void disconnect() {
         this.conn = null;
         out.println("Disconnected from database: " + this.bdd);
     }
