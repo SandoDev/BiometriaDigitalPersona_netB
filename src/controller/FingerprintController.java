@@ -21,8 +21,8 @@ import com.digitalpersona.onetouch.processing.DPFPImageQualityException;
 import java.awt.Image;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import java.sql.SQLException;
@@ -32,7 +32,6 @@ import model.Fingerprint;
 import model.CourseGroup;
 import DAO.CourseGroupDAO;
 import DAO.StudentDAO;
-import java.util.ArrayList;
 import view.FingerprintForm;
 
 /**

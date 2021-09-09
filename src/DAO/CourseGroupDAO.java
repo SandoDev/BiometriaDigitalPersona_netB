@@ -23,7 +23,7 @@ public class CourseGroupDAO {
     private void init() throws SQLException{
         String sql = "select cg.idCourseGroup as id, " +
             "cg.name as name, " +
-            "CONCAT(s.description) as subject, " +
+            "s.description as subject, " +
             "CONCAT(t.name, ' ', t.lastName) as teacher, " +
             "CONCAT(p.year, '-', p.period) as period " +
                 "from CourseGroup cg " +
