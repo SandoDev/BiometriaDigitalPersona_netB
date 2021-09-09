@@ -21,12 +21,17 @@ import com.digitalpersona.onetouch.processing.DPFPImageQualityException;
 import java.awt.Image;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import java.sql.SQLException;
 
 import model.Student;
 import model.Fingerprint;
+import model.CourseGroup;
+import DAO.CourseGroupDAO;
+import DAO.StudentDAO;
 import view.FingerprintForm;
 
 /**
@@ -74,6 +79,26 @@ public class FingerprintController {
     
     public int getFeaturesNeeded() {
         return this.fingerprint.recruiter.getFeaturesNeeded();
+    }
+    
+    public void setCourseGroups() {
+        try {
+            CourseGroupDAO dao = new CourseGroupDAO();
+            List<CourseGroup> courses = dao.getAll();
+            this.fingerprintForm.setCourseGroups(courses);
+        } catch(SQLException e){
+            this.fingerprintForm.showMessage("An error ocurred consulting CourseGroups: "+e.getMessage());
+        }
+        
+    }
+    
+    public List<Student> getStudents(CourseGroup course) {
+        try {
+            StudentDAO dao = new StudentDAO(course.getId());
+            return dao.getAll();
+        } catch(SQLException e){
+            return new ArrayList<>();
+        }
     }
     
     /**

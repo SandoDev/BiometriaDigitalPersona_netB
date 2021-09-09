@@ -32,6 +32,7 @@ public class ProcessFingerprint {
             }
         });
         form.setVisible(true);
-        
+        // Initial config
+        controller.setCourseGroups();
     }
 }
