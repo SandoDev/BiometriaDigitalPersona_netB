@@ -1,5 +1,7 @@
 package DAO;
 
+import static java.lang.System.err;
+import static java.lang.System.out;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,28 +13,24 @@ import model.Student;
 import model.Database;
 
 public class StudentDAO {
-    
-    List<Student> students = new ArrayList<>();
 	
     Database con = new Database();
     
-    public StudentDAO (int courseGroupId) throws SQLException{
-        this.init(courseGroupId);
-    }
-    
-    private void init(int courseGroupId) throws SQLException{
+    public List<Student> getByCourseGroup(int courseGroupId) throws SQLException{
+        List<Student> students = new ArrayList<>();
+        Connection c = con.getConnection();
         String sql = "select s.idStudent as id, " +
             "s.name as name, " +
             "s.lastName as lastName, " +
             "s.email as email, " +
             "s.identification as identification, " +
             "s.codeInstitutional as codeInstitutional, " +
-            "s.phone as phone " +
+            "s.phone as phone, " +
+            "s.fingerprint as fingerprint " +
                 "from Student s " +
                 "inner join Inscription i on i.student_idStudent = s.idStudent " +
                 "inner join CourseGroup cg on cg.idCourseGroup = i.courseGroup_idCourseGroup " +
                 "where cg.idCourseGroup = ?;";
-        Connection c = con.getConnection();
         PreparedStatement stm = c.prepareStatement(sql);
         stm.setInt(1, courseGroupId);
         ResultSet rs = stm.executeQuery();
@@ -44,17 +42,28 @@ public class StudentDAO {
                 rs.getString("email"),
                 rs.getString("identification"),
                 rs.getString("codeInstitutional"),
-                rs.getString("phone")
+                rs.getString("phone"),
+                rs.getBytes("fingerprint")
             );
-            this.students.add(student);
+            students.add(student);
         }
         stm.close();
         rs.close();
         c.close();
+        this.con.disconnect();
+        return students;
     }
     
-    public List<Student> getAll() {
-        return this.students;
+    public int saveFingerprint(Student student) throws SQLException {
+        Connection c = con.getConnection();
+        String query = "update student set fingerprint=? where identification=" + student.getIdentification();
+        PreparedStatement stm = c.prepareStatement(query);
+        stm.setBinaryStream(1, student.getFingerprintData(), student.getFingerprintSize());
+        int rowCount = stm.executeUpdate();
+        
+        stm.close();
+        c.close();
+        this.con.disconnect();
+        return rowCount;
     }
-
 }

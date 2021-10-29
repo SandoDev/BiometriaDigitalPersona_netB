@@ -11,16 +11,11 @@ import model.CourseGroup;
 import model.Database;
 
 public class CourseGroupDAO {
-    
-    List<CourseGroup> courses = new ArrayList<>();
 	
     Database con = new Database();
     
-    public CourseGroupDAO () throws SQLException{
-        this.init();
-    }
-    
-    private void init() throws SQLException{
+    public List<CourseGroup> getAll() throws SQLException{
+        List<CourseGroup> courses = new ArrayList<>();
         String sql = "select cg.idCourseGroup as id, " +
             "cg.name as name, " +
             "s.description as subject, " +
@@ -42,15 +37,13 @@ public class CourseGroupDAO {
                 rs.getString("teacher"),
                 rs.getString("period")
             );
-            this.courses.add(courseGroup);
+            courses.add(courseGroup);
         }
         stm.close();
         rs.close();
         c.close();
-    }
-    
-    public List<CourseGroup> getAll() {
-        return this.courses;
+        con.disconnect();
+        return courses;
     }
 
 }
