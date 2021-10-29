@@ -1,13 +1,8 @@
 package model;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
-import static java.lang.System.out;
-import static java.lang.System.err;
 
 import java.io.ByteArrayInputStream;
-import java.sql.Connection;
+import java.util.Arrays;
 
 public class Student {
 
@@ -22,8 +17,6 @@ public class Student {
     String codeInstitutional;
     String phone;
     byte[] fingerprint;
-
-    Database con = new Database();
     
     public Student(){}
     
@@ -63,31 +56,20 @@ public class Student {
         this.fingerPrintSize = fingerPrintSize;
     }
 
-    public boolean saveFingerprint(String doc) {
-        try {
-            Connection c = con.getConnection(); // Set up connection with DB
-
-            String query = "update student set fingerprint=? where identification=" + doc;
-            PreparedStatement preparedStatement = c.prepareStatement(query);
-            preparedStatement.setBinaryStream(1, this.fingerPrintData, this.fingerPrintSize);
-            preparedStatement.executeUpdate();
-            out.println("Statement executed");
-
-            preparedStatement.close();
-            return true;
-        } catch (SQLException ex) {
-            err.println("An error ocurred saving data in bd: " + ex.getMessage());
-            return false;
-        } finally {
-            con.disconnect();
-        }
-    }
-
     @Override
     public String toString(){
         return this.name + " " + this.lastName;
     }
-
+    
+    public String allToString() {
+        return String.join("\n ", Arrays.asList(
+            this.name + " " + this.lastName,
+            "Identification: " + this.identification,
+            "Institutional Code: " + this.codeInstitutional,
+            "Email: " + this.email
+        ));
+    }
+    
     public int getId() {
         return id;
     }

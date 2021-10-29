@@ -1,5 +1,7 @@
 package DAO;
 
+import static java.lang.System.err;
+import static java.lang.System.out;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,6 +18,7 @@ public class StudentDAO {
     
     public List<Student> getByCourseGroup(int courseGroupId) throws SQLException{
         List<Student> students = new ArrayList<>();
+        Connection c = con.getConnection();
         String sql = "select s.idStudent as id, " +
             "s.name as name, " +
             "s.lastName as lastName, " +
@@ -28,7 +31,6 @@ public class StudentDAO {
                 "inner join Inscription i on i.student_idStudent = s.idStudent " +
                 "inner join CourseGroup cg on cg.idCourseGroup = i.courseGroup_idCourseGroup " +
                 "where cg.idCourseGroup = ?;";
-        Connection c = con.getConnection();
         PreparedStatement stm = c.prepareStatement(sql);
         stm.setInt(1, courseGroupId);
         ResultSet rs = stm.executeQuery();
@@ -48,6 +50,20 @@ public class StudentDAO {
         stm.close();
         rs.close();
         c.close();
+        this.con.disconnect();
         return students;
+    }
+    
+    public int saveFingerprint(Student student) throws SQLException {
+        Connection c = con.getConnection();
+        String query = "update student set fingerprint=? where identification=" + student.getIdentification();
+        PreparedStatement stm = c.prepareStatement(query);
+        stm.setBinaryStream(1, student.getFingerprintData(), student.getFingerprintSize());
+        int rowCount = stm.executeUpdate();
+        
+        stm.close();
+        c.close();
+        this.con.disconnect();
+        return rowCount;
     }
 }

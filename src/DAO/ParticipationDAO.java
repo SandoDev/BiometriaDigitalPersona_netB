@@ -19,6 +19,7 @@ public class ParticipationDAO {
         stm.execute();
         stm.close();
         c.close();
+        con.disconnect();
     }
 
 }

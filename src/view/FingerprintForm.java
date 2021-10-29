@@ -35,7 +35,6 @@ public class FingerprintForm extends javax.swing.JFrame {
         this.txtAreaHistory.setEditable(false);
         this.txtAreaHistory.setRows(5);
         this.txtAreaHistory.setColumns(20);
-        this.btnStart.setEnabled(true);
         this.btnStop.setEnabled(false);
         this.btnSave.setEnabled(false);
         this.btnIdentify.setEnabled(false);
@@ -107,10 +106,6 @@ public class FingerprintForm extends javax.swing.JFrame {
         this.btnStop.setEnabled(value);
     }
     
-    public void enableBtnStart(Boolean value){
-        this.btnStart.setEnabled(value);
-    }
-    
     public void enableBtnParticipations(Boolean value){
         this.btnRegisterParticipation.setEnabled(value);
     }
@@ -119,8 +114,20 @@ public class FingerprintForm extends javax.swing.JFrame {
         this.btnRegisterAssistance.setEnabled(value);
     }
     
+    public void enableBtnSave(Boolean value){
+        this.btnSave.setEnabled(value);
+    }
+    
+    public void enableBtnIdentify(Boolean value){
+        this.btnIdentify.setEnabled(value);
+    }
+    
     public void enableCmbCourseGroups(Boolean value){
         this.cmbCourseGroups.setEnabled(value);
+    }
+    
+    public void setTitleText(String str){
+        this.lblTitle.setText(str);
     }
     
     public void formWindowClosing() {
@@ -163,8 +170,8 @@ public class FingerprintForm extends javax.swing.JFrame {
         cmbCourseGroups = new javax.swing.JComboBox<>();
         btnRegisterParticipation = new javax.swing.JButton();
         btnRegisterAssistance = new javax.swing.JButton();
-        btnStart = new javax.swing.JButton();
         btnStop = new javax.swing.JButton();
+        lblTitle = new javax.swing.JLabel();
         panelHistory = new javax.swing.JPanel();
         scrollHistory = new javax.swing.JScrollPane();
         txtAreaHistory = new javax.swing.JTextArea();
@@ -241,20 +248,8 @@ public class FingerprintForm extends javax.swing.JFrame {
             }
         });
 
-        btnStart.setBackground(new java.awt.Color(0, 204, 0));
-        btnStart.setForeground(new java.awt.Color(255, 255, 255));
-        btnStart.setIcon(new javax.swing.ImageIcon("C:\\Users\\D2D\\dev\\digital_biometric\\dist\\images\\start-5.png")); // NOI18N
-        btnStart.setText("Start");
-        btnStart.setPreferredSize(new java.awt.Dimension(160, 30));
-        btnStart.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnStartActionPerformed(evt);
-            }
-        });
-
         btnStop.setBackground(new java.awt.Color(255, 51, 51));
         btnStop.setForeground(new java.awt.Color(255, 255, 255));
-        btnStop.setIcon(new javax.swing.ImageIcon("C:\\Users\\D2D\\dev\\digital_biometric\\dist\\images\\stop-5.png")); // NOI18N
         btnStop.setText("Stop");
         btnStop.setPreferredSize(new java.awt.Dimension(160, 30));
         btnStop.addActionListener(new java.awt.event.ActionListener() {
@@ -263,33 +258,38 @@ public class FingerprintForm extends javax.swing.JFrame {
             }
         });
 
+        lblTitle.setText("WELCOME TO THE JUNGLE!");
+
         javax.swing.GroupLayout panelButtonsLayout = new javax.swing.GroupLayout(panelButtons);
         panelButtons.setLayout(panelButtonsLayout);
         panelButtonsLayout.setHorizontalGroup(
             panelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelButtonsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnIdentify, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnSave, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(panelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(panelButtonsLayout.createSequentialGroup()
-                        .addComponent(cmbCourseGroups, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(panelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnIdentify, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnSave, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnRegisterParticipation, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(panelButtonsLayout.createSequentialGroup()
-                        .addComponent(btnStart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnStop, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(11, 11, 11)
-                        .addComponent(btnRegisterAssistance, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(panelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(panelButtonsLayout.createSequentialGroup()
+                                .addComponent(cmbCourseGroups, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnRegisterParticipation, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(panelButtonsLayout.createSequentialGroup()
+                                .addComponent(btnStop, javax.swing.GroupLayout.DEFAULT_SIZE, 332, Short.MAX_VALUE)
+                                .addGap(11, 11, 11)
+                                .addComponent(btnRegisterAssistance, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap())
         );
         panelButtonsLayout.setVerticalGroup(
             panelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelButtonsLayout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(lblTitle)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(btnIdentify, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnRegisterParticipation, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -298,7 +298,6 @@ public class FingerprintForm extends javax.swing.JFrame {
                 .addGroup(panelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnRegisterAssistance, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnStart, javax.swing.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE)
                     .addComponent(btnStop, javax.swing.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -322,7 +321,7 @@ public class FingerprintForm extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(panelHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelHistoryLayout.createSequentialGroup()
-                        .addComponent(scrollHistory)
+                        .addComponent(scrollHistory, javax.swing.GroupLayout.DEFAULT_SIZE, 334, Short.MAX_VALUE)
                         .addContainerGap())
                     .addGroup(panelHistoryLayout.createSequentialGroup()
                         .addComponent(lblTitleHistory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -334,7 +333,7 @@ public class FingerprintForm extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(lblTitleHistory)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(scrollHistory, javax.swing.GroupLayout.DEFAULT_SIZE, 269, Short.MAX_VALUE)
+                .addComponent(scrollHistory, javax.swing.GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -367,57 +366,29 @@ public class FingerprintForm extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        this.fingerprintController.saveFingerprint();
-        lblFingerprintImage.setIcon(null);
-        this.fingerprintController.start();
-        btnSave.setEnabled(false);
+    private void btnStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStopActionPerformed
         this.fingerprintController.stop();
-        this.btnIdentify.setEnabled(false);
-        this.btnSave.setEnabled(false);
-    }//GEN-LAST:event_btnSaveActionPerformed
-
-    private void btnIdentifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIdentifyActionPerformed
-        try {
-            this.fingerprintController.identifyFingerprint();
-            lblFingerprintImage.setIcon(null);
-            this.fingerprintController.start();
-            showMessage("Using fingerprint lector...");
-        } catch (IOException ex) {
-            Logger.getLogger(FingerprintForm.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            this.fingerprintController.stop();
-            this.btnIdentify.setEnabled(false);
-            this.btnSave.setEnabled(false);
-        }
-    }//GEN-LAST:event_btnIdentifyActionPerformed
-
-    private void cmbCourseGroupsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbCourseGroupsActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cmbCourseGroupsActionPerformed
-
-    private void btnRegisterParticipationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterParticipationActionPerformed
-        this.fingerprintController.enableParticipations();
-    }//GEN-LAST:event_btnRegisterParticipationActionPerformed
+    }//GEN-LAST:event_btnStopActionPerformed
 
     private void btnRegisterAssistanceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterAssistanceActionPerformed
         this.fingerprintController.enableAssistances();
     }//GEN-LAST:event_btnRegisterAssistanceActionPerformed
 
-    private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
-        this.fingerprintController.process();
-        this.fingerprintController.enableIdentifyAndSave();
-        this.fingerprintController.start();
-        btnSave.setEnabled(false);
-        btnIdentify.setEnabled(false);
-    }//GEN-LAST:event_btnStartActionPerformed
+    private void btnRegisterParticipationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterParticipationActionPerformed
+        this.fingerprintController.enableParticipations();
+    }//GEN-LAST:event_btnRegisterParticipationActionPerformed
 
-    private void btnStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStopActionPerformed
-        this.fingerprintController.stop();
-        btnSave.setEnabled(false);
-        btnIdentify.setEnabled(false);
-        btnStart.setEnabled(true);
-    }//GEN-LAST:event_btnStopActionPerformed
+    private void cmbCourseGroupsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbCourseGroupsActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmbCourseGroupsActionPerformed
+
+    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
+        this.fingerprintController.enableSave();
+    }//GEN-LAST:event_btnSaveActionPerformed
+
+    private void btnIdentifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIdentifyActionPerformed
+        this.fingerprintController.enableIdentify();
+    }//GEN-LAST:event_btnIdentifyActionPerformed
 
     public static void start() {
         /* Set the Nimbus look and feel */
@@ -457,10 +428,10 @@ public class FingerprintForm extends javax.swing.JFrame {
     private javax.swing.JButton btnRegisterAssistance;
     private javax.swing.JButton btnRegisterParticipation;
     private javax.swing.JButton btnSave;
-    private javax.swing.JButton btnStart;
     private javax.swing.JButton btnStop;
     private javax.swing.JComboBox<String> cmbCourseGroups;
     private javax.swing.JLabel lblFingerprintImage;
+    private javax.swing.JLabel lblTitle;
     private javax.swing.JLabel lblTitleFingerpringImage;
     private javax.swing.JLabel lblTitleHistory;
     private javax.swing.JPanel panelButtons;

@@ -13,9 +13,6 @@ import model.Student;
 import model.Inscription;
 
 public class InscriptionDAO {
-    
-    List<Student> students = new ArrayList<>();
-    Student student = new Student();
 	
     Database con = new Database();
     
@@ -45,6 +42,7 @@ public class InscriptionDAO {
         stm.close();
         rs.close();
         c.close();
+        con.disconnect();
         return inscription;
     }
 

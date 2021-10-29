@@ -19,6 +19,7 @@ public class AssistanceDAO {
         stm.execute();
         stm.close();
         c.close();
+        con.disconnect();
     }
 
 }

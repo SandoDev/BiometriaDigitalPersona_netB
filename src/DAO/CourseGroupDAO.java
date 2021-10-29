@@ -42,6 +42,7 @@ public class CourseGroupDAO {
         stm.close();
         rs.close();
         c.close();
+        con.disconnect();
         return courses;
     }
 

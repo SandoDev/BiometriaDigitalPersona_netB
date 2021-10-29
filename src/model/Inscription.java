@@ -7,8 +7,6 @@ public class Inscription {
     CourseGroup courseGroup;
     Student student;
 
-    Database con = new Database();
-    
     public Inscription(){}
     
     public Inscription(
