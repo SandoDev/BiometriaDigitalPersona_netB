@@ -5,6 +5,7 @@
  */
 package controller;
 
+import DAO.AssistanceDAO;
 import static java.lang.System.err;
 
 import com.digitalpersona.onetouch.DPFPDataPurpose;
@@ -129,7 +130,7 @@ public class FingerprintController {
     public void enableParticipations(){
         // Get Students
         CourseGroup course = this.fingerprintForm.getCourseSelected();
-        this.fingerprintForm.showErrorMessage(course.toString());
+        this.fingerprintForm.showInfoMessage("Course selected: " + course.toString());
         List<Student> students = this.getStudents(course);
         if (students == null || students.isEmpty()) {
             this.fingerprintForm.showErrorMessage("Students not found");
@@ -201,7 +202,8 @@ public class FingerprintController {
                     this.clear();
                     return;
                 }
-                fingerprintForm.showSuccessfulMessage("Template created. Your participation were registered!");
+                String rockOn = new String(Character.toChars(0x270C));
+                fingerprintForm.showSuccessfulMessage(rockOn + " Your participation were registered!");
                 this.clear();
                 break;
 
@@ -214,6 +216,95 @@ public class FingerprintController {
         }
     }
     
+    public void enableAssistances(){
+        // Get Students
+        CourseGroup course = this.fingerprintForm.getCourseSelected();
+        this.fingerprintForm.showInfoMessage("Course selected: " + course.toString());
+        List<Student> students = this.getStudents(course);
+        if (students == null || students.isEmpty()) {
+            this.fingerprintForm.showErrorMessage("Students not found");
+            return;
+        }
+        String str = students.size() + " studens loaded";
+        this.fingerprintForm.showMessage(str);
+        
+        // Get templates and register participation
+        this.fingerprint.reader.addDataListener(new DPFPDataAdapter() {
+            @Override
+            public void dataAcquired(final DPFPDataEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        // MEJORATE PERFORMANCE: IT IS ON DURING 20 SECS
+                        processAssistances(e, students, course);
+                    }
+                });
+            }
+        });
+        
+        this.start();
+    }
+    
+    private void processAssistances(DPFPDataEvent e, List<Student> students, CourseGroup course) {
+        fingerprintForm.showMessage("Fingerprint captured");
+        /** Process fingerprint sample */
+        DPFPSample sample = e.getSample();
+
+        /** Process the fingerprint sample and create a set of features to incription */
+        fingerprint.featuresInscription = fingerprint.extractFeatures(sample, DPFPDataPurpose.DATA_PURPOSE_ENROLLMENT);
+
+        /** Process the fingerprint sample and create a set of features to verification */
+        fingerprint.featuresVerification = fingerprint.extractFeatures(sample, DPFPDataPurpose.DATA_PURPOSE_VERIFICATION);
+
+        /** Verify the quality of the fingerprint sample and if is good add it to its recruiter */
+        if (fingerprint.featuresInscription == null) {
+            return;
+        }
+        
+        try {
+            fingerprint.recruiter.addFeatures(fingerprint.featuresInscription); 
+
+            /** Draw captured fingerprint */
+            Image image = fingerprint.createFingerprintImage(sample);
+            fingerprintForm.drawFingerprint(image);
+
+        } catch (DPFPImageQualityException ex) {
+            fingerprintForm.showErrorMessage("ERROR: " + ex.getMessage());
+        }
+        showFingerprintMissing();
+        /** Verify if etmplate was created */
+        switch (fingerprint.recruiter.getTemplateStatus()) {
+            case TEMPLATE_STATUS_READY: // Capture successful
+                fingerprint.setTemplate(fingerprint.recruiter.getTemplate());
+                InscriptionDAO inscriptionDAO = new InscriptionDAO();
+                AssistanceDAO assistanceDAO = new AssistanceDAO();
+                Student student = fingerprint.identifyFingerprint(students);
+                if(student == null){
+                    fingerprintForm.showErrorMessage("ERROR: Student not found in course selected (" + course.toString() +")");
+                    this.clear();
+                    return;
+                }
+                try {
+                    Inscription inscription = inscriptionDAO.getOne(course, student);
+                    assistanceDAO.registerAssistance(inscription.getId());
+                } catch(SQLException ex){
+                    fingerprintForm.showErrorMessage("ERROR: Assistance cannot be registered: " + ex.getMessage());
+                    this.clear();
+                    return;
+                }
+                String rockOn = new String(Character.toChars(0x270C));
+                fingerprintForm.showSuccessfulMessage(rockOn + " Your assistance were registered!");
+                this.clear();
+                break;
+
+            case TEMPLATE_STATUS_FAILED: // Capture failed
+                fingerprintForm.showErrorMessage("Template cannot be created, try again");
+                this.stop();
+                this.clear();
+                this.start();
+                break;
+        }
+    }
+        
     public void start(){
         this.fingerprintForm.showMessage("------READER STARTED--------");
         this.fingerprintForm.enableBtnStop(true);
@@ -228,16 +319,18 @@ public class FingerprintController {
         this.fingerprintForm.showMessage("------READER STOPPED--------");
         this.fingerprintForm.enableBtnStop(false);
         this.fingerprintForm.enableBtnStart(true);
-        this.fingerprintForm.enableBtnParticipations(true);
-        this.fingerprintForm.enableBtnAssistance(true);
         /* Fix bug before to enable course groups:
         
             The thread "this.fingerprint.reader.addDataListener" does not stop
             when this.fingerprint.reader.stopCapture() is called.
             Search how to stop thread.
         */
+        // this.fingerprintForm.enableBtnParticipations(true);
+        // this.fingerprintForm.enableBtnAssistance(true);
         // this.fingerprintForm.enableCmbCourseGroups(true);
         this.fingerprint.reader.stopCapture();
+        this.fingerprintForm.showInfoMessage("Thank you! Execute again the app if you want to continue");
+        System.exit(0);
     }
     
     public void clear(){

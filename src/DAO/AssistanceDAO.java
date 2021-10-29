@@ -5,13 +5,13 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import model.Database;
 
-public class ParticipationDAO {
+public class AssistanceDAO {
     
     Database con = new Database();
         
-    public void registerParticipation(Integer inscription) throws SQLException{
-        String query = "insert into participation "
-                + "(`datetime`, `inscription_idInscription`) "
+    public void registerAssistance(Integer inscription) throws SQLException{
+        String query = "insert into assistance "
+                + "(`entryTime`, `inscription_idInscription`) "
                 + "values(current_timestamp(), ?)";
         Connection c = con.getConnection();
         PreparedStatement stm = c.prepareStatement(query);

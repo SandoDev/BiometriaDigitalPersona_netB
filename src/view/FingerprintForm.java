@@ -81,6 +81,15 @@ public class FingerprintForm extends javax.swing.JFrame {
         );
     }
     
+    public void showInfoMessage(String msg) {
+        JOptionPane.showMessageDialog(
+            FingerprintForm.this,
+            msg,
+            "Action info",
+            JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+    
     public void showSuccessfulMessage(String msg) {
         JOptionPane.showMessageDialog(
             FingerprintForm.this,
@@ -392,7 +401,7 @@ public class FingerprintForm extends javax.swing.JFrame {
     }//GEN-LAST:event_btnRegisterParticipationActionPerformed
 
     private void btnRegisterAssistanceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterAssistanceActionPerformed
-        this.showErrorMessage("Button disabled");
+        this.fingerprintController.enableAssistances();
     }//GEN-LAST:event_btnRegisterAssistanceActionPerformed
 
     private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
