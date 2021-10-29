@@ -30,8 +30,13 @@ import java.sql.SQLException;
 import model.Student;
 import model.Fingerprint;
 import model.CourseGroup;
+import model.Inscription;
 import DAO.CourseGroupDAO;
+import DAO.InscriptionDAO;
+import DAO.ParticipationDAO;
 import DAO.StudentDAO;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import view.FingerprintForm;
 
 /**
@@ -48,20 +53,6 @@ public class FingerprintController {
     public FingerprintController(FingerprintForm fingerprintForm, Fingerprint fingerprint){
         this.fingerprintForm = fingerprintForm;
         this.fingerprint = fingerprint;
-    }
-    
-    /**
-     * Start capture
-     */
-    public void start() {
-        this.fingerprint.reader.startCapture();
-    }
-    
-    /**
-     * Start capture
-     */
-    public void stop() {
-        this.fingerprint.reader.stopCapture();
     }
     
     /**
@@ -83,9 +74,13 @@ public class FingerprintController {
     
     public void setCourseGroups() {
         try {
+            this.fingerprintForm.showMessage("WAIT: Loading course groups...");
             CourseGroupDAO dao = new CourseGroupDAO();
             List<CourseGroup> courses = dao.getAll();
             this.fingerprintForm.setCourseGroups(courses);
+            this.fingerprintForm.enableBtnAssistance(true);
+            this.fingerprintForm.enableBtnParticipations(true);
+            this.fingerprintForm.showMessage("SUCCESSFUL: Course Groups loaded");
         } catch(SQLException e){
             this.fingerprintForm.showMessage("An error ocurred consulting CourseGroups: "+e.getMessage());
         }
@@ -94,8 +89,8 @@ public class FingerprintController {
     
     public List<Student> getStudents(CourseGroup course) {
         try {
-            StudentDAO dao = new StudentDAO(course.getId());
-            return dao.getAll();
+            StudentDAO dao = new StudentDAO();
+            return dao.getByCourseGroup(course.getId());
         } catch(SQLException e){
             return new ArrayList<>();
         }
@@ -110,7 +105,6 @@ public class FingerprintController {
 
         Student student = new Student();
         student.setFingerprintData(datosHuella);
-        err.println(student.getFingerprintData());
         student.setFingerprintSize(this.fingerprint.template.serialize().length);
         Boolean result = student.saveFingerprint(doc);
 
@@ -131,11 +125,127 @@ public class FingerprintController {
          */
 
     }
+    
+    public void enableParticipations(){
+        // Get Students
+        CourseGroup course = this.fingerprintForm.getCourseSelected();
+        this.fingerprintForm.showErrorMessage(course.toString());
+        List<Student> students = this.getStudents(course);
+        if (students == null || students.isEmpty()) {
+            this.fingerprintForm.showErrorMessage("Students not found");
+            return;
+        }
+        String str = students.size() + " studens loaded";
+        this.fingerprintForm.showMessage(str);
+        
+        // Get templates and register participation
+        this.fingerprint.reader.addDataListener(new DPFPDataAdapter() {
+            @Override
+            public void dataAcquired(final DPFPDataEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        // MEJORATE PERFORMANCE: IT IS ON DURING 20 SECS
+                        processParticipations(e, students, course);
+                    }
+                });
+            }
+        });
+        
+        this.start();
+    }
+    
+    private void processParticipations(DPFPDataEvent e, List<Student> students, CourseGroup course) {
+        fingerprintForm.showMessage("Fingerprint captured");
+        /** Process fingerprint sample */
+        DPFPSample sample = e.getSample();
 
-    /**
-     *
-     */
-    public void process() {
+        /** Process the fingerprint sample and create a set of features to incription */
+        fingerprint.featuresInscription = fingerprint.extractFeatures(sample, DPFPDataPurpose.DATA_PURPOSE_ENROLLMENT);
+
+        /** Process the fingerprint sample and create a set of features to verification */
+        fingerprint.featuresVerification = fingerprint.extractFeatures(sample, DPFPDataPurpose.DATA_PURPOSE_VERIFICATION);
+
+        /** Verify the quality of the fingerprint sample and if is good add it to its recruiter */
+        if (fingerprint.featuresInscription == null) {
+            return;
+        }
+        
+        try {
+            fingerprint.recruiter.addFeatures(fingerprint.featuresInscription); 
+
+            /** Draw captured fingerprint */
+            Image image = fingerprint.createFingerprintImage(sample);
+            fingerprintForm.drawFingerprint(image);
+
+        } catch (DPFPImageQualityException ex) {
+            fingerprintForm.showErrorMessage("ERROR: " + ex.getMessage());
+        }
+        showFingerprintMissing();
+        /** Verify if etmplate was created */
+        switch (fingerprint.recruiter.getTemplateStatus()) {
+            case TEMPLATE_STATUS_READY: // Capture successful
+                fingerprint.setTemplate(fingerprint.recruiter.getTemplate());
+                InscriptionDAO inscriptionDAO = new InscriptionDAO();
+                ParticipationDAO participationDAO = new ParticipationDAO();
+                Student student = fingerprint.identifyFingerprint(students);
+                if(student == null){
+                    fingerprintForm.showErrorMessage("ERROR: Student not found in course selected (" + course.toString() +")");
+                    this.clear();
+                    return;
+                }
+                try {
+                    Inscription inscription = inscriptionDAO.getOne(course, student);
+                    participationDAO.registerParticipation(inscription.getId());
+                } catch(SQLException ex){
+                    fingerprintForm.showErrorMessage("ERROR: Participation cannot be registered: " + ex.getMessage());
+                    this.clear();
+                    return;
+                }
+                fingerprintForm.showSuccessfulMessage("Template created. Your participation were registered!");
+                this.clear();
+                break;
+
+            case TEMPLATE_STATUS_FAILED: // Capture failed
+                fingerprintForm.showErrorMessage("Template cannot be created, try again");
+                this.stop();
+                this.clear();
+                this.start();
+                break;
+        }
+    }
+    
+    public void start(){
+        this.fingerprintForm.showMessage("------READER STARTED--------");
+        this.fingerprintForm.enableBtnStop(true);
+        this.fingerprintForm.enableBtnStart(false);
+        this.fingerprintForm.enableBtnParticipations(false);
+        this.fingerprintForm.enableBtnAssistance(false);
+        this.fingerprintForm.enableCmbCourseGroups(false);
+        this.fingerprint.reader.startCapture();
+    }
+    
+    public void stop(){
+        this.fingerprintForm.showMessage("------READER STOPPED--------");
+        this.fingerprintForm.enableBtnStop(false);
+        this.fingerprintForm.enableBtnStart(true);
+        this.fingerprintForm.enableBtnParticipations(true);
+        this.fingerprintForm.enableBtnAssistance(true);
+        /* Fix bug before to enable course groups:
+        
+            The thread "this.fingerprint.reader.addDataListener" does not stop
+            when this.fingerprint.reader.stopCapture() is called.
+            Search how to stop thread.
+        */
+        // this.fingerprintForm.enableCmbCourseGroups(true);
+        this.fingerprint.reader.stopCapture();
+    }
+    
+    public void clear(){
+        this.fingerprint.recruiter.clear();
+        this.fingerprint.setTemplate(null);
+    }
+    
+    public void enableIdentifyAndSave(){
         /** Thread that will get data */
         this.fingerprint.reader.addDataListener(new DPFPDataAdapter() {
             @Override
@@ -144,12 +254,68 @@ public class FingerprintController {
                     public void run() {
                         fingerprintForm.showMessage("Fingerprint captured");
                         /** Process fingerprint capture */
-                        processCapture(e.getSample());
+                        DPFPSample sample = e.getSample();
+                        
+                        /* Process fingerprint sample and create a set of features to inscribe them */
+                        fingerprint.featuresInscription = fingerprint.extractFeatures(sample, DPFPDataPurpose.DATA_PURPOSE_ENROLLMENT);
+
+                        /* Process fingerprint sample and create a set of features to verify them */
+                        fingerprint.featuresVerification = fingerprint.extractFeatures(sample, DPFPDataPurpose.DATA_PURPOSE_VERIFICATION);
+
+                        /* Verify the qualifi of fingerprint sample and is added to its recruiter if is good */
+                        if (fingerprint.featuresInscription != null) {
+                            try {
+                                fingerprint.recruiter.addFeatures(fingerprint.featuresInscription); 
+
+                                /* Draw fingerprint captured */
+                                Image image = fingerprint.createFingerprintImage(sample);
+                                fingerprintForm.drawFingerprint(image);
+
+                            } catch (DPFPImageQualityException ex) {
+                                fingerprintForm.showMessage("Error: " + ex.getMessage());
+                            } finally {
+                                showFingerprintMissing();
+                                /* Verify if template have been created*/
+                                switch (fingerprint.recruiter.getTemplateStatus()) {
+                                    case TEMPLATE_STATUS_READY: // Capture successful
+                                        stop();
+                                        fingerprint.setTemplate(fingerprint.recruiter.getTemplate());
+                                        fingerprintForm.showMessage("Template created, you can verify or identify it!");
+                                        fingerprintForm.getTemplateSuccessful();
+                                        break;
+
+                                    case TEMPLATE_STATUS_FAILED: // Capture failed
+                                        fingerprint.recruiter.clear();
+                                        fingerprintForm.showErrorMessage("Template cannot be created, try again");
+                                        stop();
+                                        fingerprint.setTemplate(null);
+                                        start();
+                                        break;
+                                    case TEMPLATE_STATUS_INSUFFICIENT: // Capture insufficient
+                                        fingerprint.recruiter.clear();
+                                        fingerprintForm.showErrorMessage("Fingerprint sample insufficient, try again");
+                                        stop();
+                                        fingerprint.setTemplate(null);
+                                        start();
+                                        break;
+                                    case TEMPLATE_STATUS_UNKNOWN:
+                                        fingerprint.recruiter.clear();
+                                        fingerprintForm.showErrorMessage("Fingerprint sample unknown, try again");
+                                        stop();
+                                        fingerprint.setTemplate(null);
+                                        start();
+                                        break;
+
+                                }
+                            }
+                        }
                     }
                 });
             }
         });
+    }
 
+    public void process() {
         /** Thread that will get reader status */
         this.fingerprint.reader.addReaderStatusListener(new DPFPReaderStatusAdapter() {
             @Override
@@ -192,7 +358,8 @@ public class FingerprintController {
             }
         });
 
-        this.fingerprint.reader.addErrorListener(new DPFPErrorAdapter() {// hilo de los posibles errores
+        /** Thread of posible errors */
+        this.fingerprint.reader.addErrorListener(new DPFPErrorAdapter() {
             public void errorReader(final DPFPErrorEvent e) {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
@@ -201,54 +368,6 @@ public class FingerprintController {
                 });
             }
         });
-    }
-    
-    /**
-     *
-     * @param sample
-     */
-    public void processCapture(DPFPSample sample) {
-        // Procesar la muestra de la huella y crear un conjunto de características con
-        // el propósito de inscripción.
-        this.fingerprint.featuresInscription = this.fingerprint.extractFeatures(sample, DPFPDataPurpose.DATA_PURPOSE_ENROLLMENT);
-
-        // Procesar la muestra de la huella y crear un conjunto de características con
-        // el propósito de verificacion.
-        this.fingerprint.featuresVerification = this.fingerprint.extractFeatures(sample, DPFPDataPurpose.DATA_PURPOSE_VERIFICATION);
-
-        // Comprobar la calidad de la muestra de la huella y lo añade a su recruiter si
-        // es bueno
-        if (this.fingerprint.featuresInscription != null) {
-            try {
-                this.fingerprint.recruiter.addFeatures(this.fingerprint.featuresInscription); 
-
-                // Dibuja la huella dactilar capturada.
-                Image image = this.fingerprint.createFingerprintImage(sample);
-                this.fingerprintForm.drawFingerprint(image);
-
-            } catch (DPFPImageQualityException ex) {
-                err.println("Error: " + ex.getMessage());
-            } finally {
-                this.showFingerprintMissing();
-                // Comprueba si la plantilla se ha creado.
-                switch (this.fingerprint.recruiter.getTemplateStatus()) {
-                    case TEMPLATE_STATUS_READY: // Capture successful
-                        this.stop();
-                        this.fingerprint.setTemplate(this.fingerprint.recruiter.getTemplate());
-                        this.fingerprintForm.showMessage("Template created, you can verify or identify it!");
-                        this.fingerprintForm.getTemplateSuccessful();
-                        break;
-
-                    case TEMPLATE_STATUS_FAILED: // Capture failed
-                        this.fingerprint.recruiter.clear();
-                        this.fingerprintForm.getTemplateFailed();
-                        this.stop();
-                        this.fingerprint.setTemplate(null);
-                        this.start();
-                        break;
-                }
-            }
-        }
     }
 
 }

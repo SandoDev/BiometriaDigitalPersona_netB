@@ -24,6 +24,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import javax.swing.JOptionPane;
 
 /**
@@ -146,11 +147,31 @@ public class Fingerprint {
                     JOptionPane.ERROR_MESSAGE);
             this.setTemplate(null);
         } catch (SQLException e) {
-            String message = "Error identifying fingerprint";
+            String message = "Error identifying fingerprint" + e.getMessage();
             JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
-            err.println(message + e.getMessage());
         } finally {
             con.disconnect();
         }
+    }
+    
+    public Student identifyFingerprint(List<Student> students){
+        for(int i = 0; i < students.size(); i++){
+            byte[] templateBuffer = students.get(i).getFingerprint();
+
+            /* Create new template from the saved in database.*/
+            DPFPTemplate referenceTemplate = DPFPGlobal.getTemplateFactory().createTemplate(templateBuffer);
+            
+            /* Send template created to object container of componente template of fingerprint*/
+            setTemplate(referenceTemplate);
+
+            /* Compare features of fingerprint recently captured with tempalte saved to user*/
+            DPFPVerificationResult result = checker.verify(featuresVerification, getTemplate());
+
+            /* Compare templates current vs from database. If It is found, it draw fingerprint and return user. */
+            if (result.isVerified()) {
+                return students.get(i);
+            }
+        }
+        return null;
     }
 }

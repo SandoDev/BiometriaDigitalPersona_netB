@@ -22,17 +22,17 @@ public class ProcessFingerprint {
         form.setController(controller);
         
         form.setDefaultCloseOperation(FingerprintForm.EXIT_ON_CLOSE);
+        
         form.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
             public void windowClosing(java.awt.event.WindowEvent evt) {
-                form.formWindowClosing();
-            }
-
-            public void windowOpened(java.awt.event.WindowEvent evt) {
-                form.formWindowOpened();
+                controller.stop();
             }
         });
+        
         form.setVisible(true);
         // Initial config
         controller.setCourseGroups();
+        controller.process();
     }
 }

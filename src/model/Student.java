@@ -21,6 +21,7 @@ public class Student {
     String identification;
     String codeInstitutional;
     String phone;
+    byte[] fingerprint;
 
     Database con = new Database();
     
@@ -33,7 +34,8 @@ public class Student {
         String email,
         String identification,
         String codeInstitutional,
-        String phone
+        String phone,
+        byte[] fingerprint
     ){
         this.id = id;
         this.name = name;
@@ -42,10 +44,10 @@ public class Student {
         this.identification = identification;
         this.codeInstitutional = codeInstitutional;
         this.phone = phone;
+        this.fingerprint = fingerprint;
     }
 
     public ByteArrayInputStream getFingerprintData() {
-        out.println(this.fingerPrintData);
         return this.fingerPrintData;
     }
 
@@ -80,10 +82,75 @@ public class Student {
             con.disconnect();
         }
     }
-    
+
     @Override
     public String toString(){
         return this.name + " " + this.lastName;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getIdentification() {
+        return identification;
+    }
+
+    public void setIdentification(String identification) {
+        this.identification = identification;
+    }
+
+    public String getCodeInstitutional() {
+        return codeInstitutional;
+    }
+
+    public void setCodeInstitutional(String codeInstitutional) {
+        this.codeInstitutional = codeInstitutional;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+    
+    public byte[] getFingerprint() {
+        return this.fingerprint;
+    }
+
+    public void setFingerprint(byte[] fingerprint) {
+        this.fingerprint = fingerprint;
+    }
+
+    
 }
