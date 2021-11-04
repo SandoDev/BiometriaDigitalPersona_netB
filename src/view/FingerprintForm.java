@@ -5,14 +5,13 @@
  */
 package view;
 
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.awt.Image;
+import java.awt.Dimension;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.ScrollPaneConstants;
 
 import controller.FingerprintController;
 import model.CourseGroup;
@@ -31,10 +30,10 @@ public class FingerprintForm extends javax.swing.JFrame {
     public FingerprintForm() {
         initComponents();
         this.setLocationRelativeTo(null); // Appear in middle of screen
-        this.scrollHistory.setViewportView(txtAreaHistory);
-        this.txtAreaHistory.setEditable(false);
-        this.txtAreaHistory.setRows(5);
-        this.txtAreaHistory.setColumns(20);
+        this.txtAreaHistory.setWrapStyleWord(true);
+        this.scrollHistory.setPreferredSize(new Dimension(296, 84));
+        this.scrollHistory.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        this.scrollHistory.setViewportView(this.txtAreaHistory);
         this.btnStop.setEnabled(false);
         this.btnSave.setEnabled(false);
         this.btnIdentify.setEnabled(false);
@@ -45,9 +44,9 @@ public class FingerprintForm extends javax.swing.JFrame {
     public void setCourseGroups(List<CourseGroup> courses)
     {
         DefaultComboBoxModel model = new DefaultComboBoxModel();
-        for (CourseGroup course : courses) {
+        courses.forEach((course) -> {
             model.addElement(course);
-        }
+        });
         this.cmbCourseGroups.setModel(model);
     }
 
@@ -163,7 +162,7 @@ public class FingerprintForm extends javax.swing.JFrame {
 
         panelFingerprint = new javax.swing.JPanel();
         lblFingerprintImage = new javax.swing.JLabel();
-        lblTitleFingerpringImage = new javax.swing.JLabel();
+        lblTitleFingerprintImage = new javax.swing.JLabel();
         panelButtons = new javax.swing.JPanel();
         btnIdentify = new javax.swing.JButton();
         btnSave = new javax.swing.JButton();
@@ -178,13 +177,11 @@ public class FingerprintForm extends javax.swing.JFrame {
         lblTitleHistory = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setMinimumSize(new java.awt.Dimension(722, 490));
+        setMinimumSize(new java.awt.Dimension(685, 490));
 
         panelFingerprint.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        lblFingerprintImage.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        lblTitleFingerpringImage.setText("Digital Fingerprint");
+        lblTitleFingerprintImage.setText("Digital Fingerprint");
 
         javax.swing.GroupLayout panelFingerprintLayout = new javax.swing.GroupLayout(panelFingerprint);
         panelFingerprint.setLayout(panelFingerprintLayout);
@@ -194,14 +191,14 @@ public class FingerprintForm extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(panelFingerprintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblFingerprintImage, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblTitleFingerpringImage, javax.swing.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE))
+                    .addComponent(lblTitleFingerprintImage, javax.swing.GroupLayout.DEFAULT_SIZE, 295, Short.MAX_VALUE))
                 .addContainerGap())
         );
         panelFingerprintLayout.setVerticalGroup(
             panelFingerprintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelFingerprintLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblTitleFingerpringImage)
+                .addComponent(lblTitleFingerprintImage)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblFingerprintImage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -279,7 +276,7 @@ public class FingerprintForm extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnRegisterParticipation, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(panelButtonsLayout.createSequentialGroup()
-                                .addComponent(btnStop, javax.swing.GroupLayout.DEFAULT_SIZE, 332, Short.MAX_VALUE)
+                                .addComponent(btnStop, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addGap(11, 11, 11)
                                 .addComponent(btnRegisterAssistance, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap())
@@ -304,11 +301,11 @@ public class FingerprintForm extends javax.swing.JFrame {
 
         panelHistory.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        txtAreaHistory.setColumns(20);
+        scrollHistory.setAutoscrolls(true);
+
         txtAreaHistory.setFont(new java.awt.Font("Tahoma", 0, 13)); // NOI18N
-        txtAreaHistory.setRows(5);
-        txtAreaHistory.setPreferredSize(new java.awt.Dimension(296, 84));
-        txtAreaHistory.setRequestFocusEnabled(false);
+        txtAreaHistory.setLineWrap(true);
+        txtAreaHistory.setBorder(null);
         scrollHistory.setViewportView(txtAreaHistory);
 
         lblTitleHistory.setText("History");
@@ -321,7 +318,7 @@ public class FingerprintForm extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(panelHistoryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelHistoryLayout.createSequentialGroup()
-                        .addComponent(scrollHistory, javax.swing.GroupLayout.DEFAULT_SIZE, 334, Short.MAX_VALUE)
+                        .addComponent(scrollHistory)
                         .addContainerGap())
                     .addGroup(panelHistoryLayout.createSequentialGroup()
                         .addComponent(lblTitleHistory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -347,7 +344,7 @@ public class FingerprintForm extends javax.swing.JFrame {
                     .addComponent(panelButtons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(panelFingerprint, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(panelHistory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -358,8 +355,8 @@ public class FingerprintForm extends javax.swing.JFrame {
                 .addComponent(panelButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(panelFingerprint, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panelHistory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(panelHistory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panelFingerprint, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -432,7 +429,7 @@ public class FingerprintForm extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> cmbCourseGroups;
     private javax.swing.JLabel lblFingerprintImage;
     private javax.swing.JLabel lblTitle;
-    private javax.swing.JLabel lblTitleFingerpringImage;
+    private javax.swing.JLabel lblTitleFingerprintImage;
     private javax.swing.JLabel lblTitleHistory;
     private javax.swing.JPanel panelButtons;
     private javax.swing.JPanel panelFingerprint;
