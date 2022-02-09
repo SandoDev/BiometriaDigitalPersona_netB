@@ -1,0 +1,7 @@
+{
+    "java.project.referencedLibraries": {
+        "include": [
+            "dist/libs/*.jar"
+        ],
+    }
+}

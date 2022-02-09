@@ -1,0 +1,49 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package config;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
+/**
+ *
+ * @author D2D
+ */
+public class PropertiesFile {
+    
+    Properties properties = null;
+    String propertyType = null;
+
+    
+    public PropertiesFile(String propertyType){
+        super();
+        this.propertyType = propertyType;
+    }
+    
+    private Properties getProperties(){
+        if(this.properties == null){
+            this.properties = new Properties();
+            try{
+                String path = "src/config/"+this.propertyType+".properties";              
+                InputStream in = new FileInputStream(path);
+                this.properties.load(in);
+            } catch(FileNotFoundException e){
+                e.printStackTrace();
+            } catch(IOException e){
+                e.printStackTrace();
+            }
+        }
+        return properties;
+    }
+    
+    public String getProperty(String nameProperty){
+        return getProperties().getProperty(nameProperty);
+    }
+
+}
