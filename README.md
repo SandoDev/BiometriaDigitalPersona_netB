@@ -10,7 +10,7 @@ Dactilar Digital Persona 4500 is a desktop application to manage fingerprint rea
 | IDE | [NetBeans](https://netbeans.org/downloads/8.2/rc/) |
 | Language | [Java](https://www.java.com/es/download/) |
 | JDK| [8](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html) |
-| Database| [MySQL](https://dev.mysql.com/downloads/mysql/)|
+| Database| [MySQL](https://dev.mysql.com/downloads/windows/installer/8.0.html)|
 | Fingerprint Reader | Digital Persona 4500 Drivers |
 
 
@@ -18,7 +18,6 @@ Dactilar Digital Persona 4500 is a desktop application to manage fingerprint rea
 
 It suggest create folder in `/dist/libs/*`
 
-- [Json Simple 1.1](http://www.java2s.com/Code/Jar/j/Downloadjsonsimple11jar.htm)
 - [MySQL Connector / J 5.1.49](https://dev.mysql.com/downloads/connector/j/5.1.html) (Find version)
 
 - *One Touch for Windows SDK [(Link Suggested)](https://github.com/Eliezer090/JavaLibsPersonal/blob/master/JavaLibs.rar):*
