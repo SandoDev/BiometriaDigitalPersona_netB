@@ -1,9 +1,0 @@
-ya que el driver que se esta utilizando para la conexion esta desactualizado!
-para que dejara hacer la conexion con el error 
-unable to load authentication plugin 'caching_sha2_password'
-se entra a la consola mysql y se digita el comando:
-ALTER USER 'username'@'ip_address' IDENTIFIED WITH mysql_native_password BY 'password';
-
-
-luego se hace esto: 
-hola yo tuve el mismo problema pero ya lo solucione primero elimina archivo mysql-connector-java de la ruta C:\Program Files\NetBeans 8.2\ide\modules\ext despues en baja el driver https://dev.mysql.com/downloads/connector/j/5.1.html, descomprime el archivo, y copia el archivo mysql-connector-java-5.1.46-bin en la ruta C:\Program Files\NetBeans 8.2\ide\modules\ext en el netbeans en prestaciones, en controladores selecciona Mysql (Connector/J driver) clic derecho y en personalizar agregar el driver.
