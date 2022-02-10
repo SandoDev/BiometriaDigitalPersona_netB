@@ -56,7 +56,7 @@ public class StudentDAO {
     
     public int saveFingerprint(Student student) throws SQLException {
         Connection c = con.getConnection();
-        String query = "update student set fingerprint=? where identification=" + student.getIdentification();
+        String query = "update Student set fingerprint=? where identification=" + student.getIdentification();
         PreparedStatement stm = c.prepareStatement(query);
         stm.setBinaryStream(1, student.getFingerprintData(), student.getFingerprintSize());
         int rowCount = stm.executeUpdate();

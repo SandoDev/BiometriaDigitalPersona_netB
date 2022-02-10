@@ -20,7 +20,7 @@ public class InscriptionDAO {
         String sql = "select " +
             "i.idInscription as id, " +
             "i.grade as grade " +
-                "from inscription i " +
+                "from Inscription i " +
                 "where i.courseGroup_idCourseGroup = ? and " +
                 "i.student_idStudent = ?" +
                 ";";

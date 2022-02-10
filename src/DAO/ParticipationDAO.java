@@ -10,7 +10,7 @@ public class ParticipationDAO {
     Database con = new Database();
         
     public void registerParticipation(Integer inscription) throws SQLException{
-        String query = "insert into participation "
+        String query = "insert into Participation "
                 + "(`datetime`, `inscription_idInscription`) "
                 + "values(current_timestamp(), ?)";
         Connection c = con.getConnection();

@@ -335,7 +335,7 @@ public class FingerprintController {
                         this.fingerprintForm.showErrorMessage("Fingerprint not saved!");
                     }
                 } catch (SQLException ex) {
-                    this.fingerprintForm.showErrorMessage("Fingerprint not saved!");
+                    this.fingerprintForm.showErrorMessage("Fingerprint not saved! "+ex.getMessage());
                 }
 
                 this.clear();

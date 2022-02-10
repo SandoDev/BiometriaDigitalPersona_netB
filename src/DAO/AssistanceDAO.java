@@ -10,7 +10,7 @@ public class AssistanceDAO {
     Database con = new Database();
         
     public void registerAssistance(Integer inscription) throws SQLException{
-        String query = "insert into assistance "
+        String query = "insert into Assistance "
                 + "(`entryTime`, `inscription_idInscription`) "
                 + "values(current_timestamp(), ?)";
         Connection c = con.getConnection();
