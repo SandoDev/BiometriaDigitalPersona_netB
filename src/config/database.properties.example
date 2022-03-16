@@ -4,3 +4,4 @@ port = 3306
 database.name = databasename
 database.user = root
 database.pass = 123456
+timeZone = America/Bogota

@@ -1,25 +1,44 @@
 package DAO;
 
+import config.PropertiesFile;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.TimeZone;
 import model.Database;
 
 public class ParticipationDAO {
-    
+
     Database con = new Database();
-        
-    public void registerParticipation(Integer inscription) throws SQLException{
+    private String timeZone = "America/Bogota";
+
+    public void registerParticipation(Integer inscription) throws SQLException {
         String query = "insert into Participation "
                 + "(`datetime`, `inscription_idInscription`) "
-                + "values(current_timestamp(), ?)";
+                + "values(?, ?)";
         Connection c = con.getConnection();
         PreparedStatement stm = c.prepareStatement(query);
-        stm.setInt(1, inscription);
+        stm.setString(1, this.getLocalDate());
+        stm.setInt(2, inscription);
         stm.execute();
         stm.close();
         c.close();
         con.disconnect();
     }
 
+    /**
+     * Obtiene la fecha local con el formato en string adecuado y basado en el
+     * tiempo zonal
+     *
+     * @return localDateTime -> "2022-03-03 10:00:00"
+     */
+    private String getLocalDate() {
+        PropertiesFile properties = new PropertiesFile("database");
+        this.timeZone = properties.getProperty("timeZone");
+        TimeZone zone = TimeZone.getTimeZone(this.timeZone);
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return dtf.format(LocalDateTime.now(zone.toZoneId()));
+    }
 }
