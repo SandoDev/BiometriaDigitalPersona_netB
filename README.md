@@ -9,7 +9,7 @@ Dactilar Digital Persona 4500 is a desktop application to manage fingerprint rea
 | Operative System | Windows |
 | IDE | [NetBeans](https://netbeans.org/downloads/8.2/rc/) |
 | Language | [Java](https://www.java.com/es/download/) |
-| JDK| [8](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html) |
+| JDK| [8](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html), [11](https://www.oracle.com/java/technologies/javase/jdk11-archive-downloads.html)|
 | Database| [MySQL](https://dev.mysql.com/downloads/windows/installer/8.0.html)|
 | Fingerprint Reader | Digital Persona 4500 Drivers |
 
