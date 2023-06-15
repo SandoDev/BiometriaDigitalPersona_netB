@@ -133,6 +133,4 @@ public class Student {
     public void setFingerprint(byte[] fingerprint) {
         this.fingerprint = fingerprint;
     }
-
-    
 }

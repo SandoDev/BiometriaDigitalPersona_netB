@@ -166,8 +166,8 @@ public class FingerprintController {
                     this.clear();
                     return;
                 }
-                String rockOn = new String(Character.toChars(0x270C));
-                fingerprintForm.showSuccessfulMessage(rockOn + " Your participation were registered!");
+                String rockOn = new String(Character.toChars(0x2705));
+                fingerprintForm.showSuccessfulMessage(rockOn + " Registered participation for " + student.toString());
                 this.clear();
                 break;
 
@@ -248,19 +248,28 @@ public class FingerprintController {
                     this.clear();
                     return;
                 }
+                Boolean stateRegistered = false;
                 try {
                     Inscription inscription = inscriptionDAO.getOne(course, student);
-                    assistanceDAO.registerAssistance(inscription.getId());
+                    if (assistanceDAO.currentAssistance(inscription.getId())){
+                        assistanceDAO.registerAssistance(inscription.getId());
+                        stateRegistered = true;
+                    }else{
+                        fingerprintForm.showInfoMessage("Unable to register assistance a second time");
+                    }
                 } catch(SQLException ex){
                     fingerprintForm.showErrorMessage("ERROR: Assistance cannot be registered: " + ex.getMessage());
                     this.clear();
                     return;
                 }
-                String rockOn = new String(Character.toChars(0x270C));
-                fingerprintForm.showSuccessfulMessage(rockOn + " Your assistance were registered!");
+                
+                if (stateRegistered){
+                    String rockOn = new String(Character.toChars(0x2705));
+                    fingerprintForm.showSuccessfulMessage(rockOn + " Registered assistance for " + student.toString());
+                }
                 this.clear();
                 break;
-
+                
             case TEMPLATE_STATUS_FAILED: // Capture failed
                 fingerprintForm.showErrorMessage("Template cannot be created, try again");
                 this.stop();
@@ -321,18 +330,25 @@ public class FingerprintController {
             case TEMPLATE_STATUS_READY: // Capture successful
                 fingerprint.setTemplate(fingerprint.recruiter.getTemplate());
                 ByteArrayInputStream datosHuella = new ByteArrayInputStream(this.fingerprint.template.serialize());
-                StudentDAO dao = new StudentDAO();
-
+                
+                String identificationStudent = JOptionPane.showInputDialog("Type identification number:");
+                
                 Student student = new Student();
-                student.setIdentification(JOptionPane.showInputDialog("Type identification number:"));
+                StudentDAO dao = new StudentDAO();
+                try{
+                    student = dao.getStudentByIdentification(identificationStudent);
+                }catch(SQLException ex){
+                    this.fingerprintForm.showErrorMessage("Student for " + identificationStudent + " error: " + ex.getMessage());
+                }
+                //student.setIdentification(identificationStudent);
                 student.setFingerprintData(datosHuella);
                 student.setFingerprintSize(this.fingerprint.template.serialize().length);
                 try {
                     int rowCount = dao.saveFingerprint(student);
                     if(rowCount == 1){
-                        this.fingerprintForm.showSuccessfulMessage("Fingerprint saved correctly");
+                        this.fingerprintForm.showSuccessfulMessage("Fingerprint saved correctly of " + student.toString());
                     }else{
-                        this.fingerprintForm.showErrorMessage("Fingerprint not saved!");
+                        this.fingerprintForm.showErrorMessage("Fingerprint not saved for " + identificationStudent);
                     }
                 } catch (SQLException ex) {
                     this.fingerprintForm.showErrorMessage("Fingerprint not saved! "+ex.getMessage());
