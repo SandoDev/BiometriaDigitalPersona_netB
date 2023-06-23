@@ -1,7 +1,5 @@
 package DAO;
 
-import static java.lang.System.err;
-import static java.lang.System.out;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -65,5 +63,29 @@ public class StudentDAO {
         c.close();
         this.con.disconnect();
         return rowCount;
+    }
+
+    public Student getStudentByIdentification(String identificationStudent) throws SQLException {
+        Connection c = con.getConnection();
+        String query = "SELECT * FROM Student where identification=" + identificationStudent;
+        PreparedStatement stm = c.prepareStatement(query);
+        ResultSet rs = stm.executeQuery();
+        Student student = new Student();
+        if(rs.first()){
+            student = new Student(
+                rs.getInt("idStudent"),
+                rs.getString("name"),
+                rs.getString("lastName"),
+                rs.getString("email"),
+                rs.getString("identification"),
+                rs.getString("codeInstitutional"),
+                rs.getString("phone"),
+                rs.getBytes("fingerprint")
+            );   
+        }
+        stm.close();
+        c.close();
+        this.con.disconnect();
+        return student;
     }
 }

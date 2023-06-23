@@ -36,7 +36,7 @@ public class FingerprintForm extends javax.swing.JFrame {
         this.scrollHistory.setViewportView(this.txtAreaHistory);
         this.btnStop.setEnabled(false);
         this.btnSave.setEnabled(false);
-        this.btnIdentify.setEnabled(false);
+        //this.btnIdentify.setEnabled(false);
         this.btnRegisterAssistance.setEnabled(false);
         this.btnRegisterParticipation.setEnabled(false);
     }
@@ -65,7 +65,7 @@ public class FingerprintForm extends javax.swing.JFrame {
     }
     
     public void getTemplateSuccessful() {
-        btnIdentify.setEnabled(true);
+        //btnIdentify.setEnabled(true);
         btnSave.setEnabled(true);
         btnSave.grabFocus();
     }
@@ -118,7 +118,7 @@ public class FingerprintForm extends javax.swing.JFrame {
     }
     
     public void enableBtnIdentify(Boolean value){
-        this.btnIdentify.setEnabled(value);
+        //this.btnIdentify.setEnabled(value);
     }
     
     public void enableCmbCourseGroups(Boolean value){
@@ -164,7 +164,6 @@ public class FingerprintForm extends javax.swing.JFrame {
         lblFingerprintImage = new javax.swing.JLabel();
         lblTitleFingerprintImage = new javax.swing.JLabel();
         panelButtons = new javax.swing.JPanel();
-        btnIdentify = new javax.swing.JButton();
         btnSave = new javax.swing.JButton();
         cmbCourseGroups = new javax.swing.JComboBox<>();
         btnRegisterParticipation = new javax.swing.JButton();
@@ -177,6 +176,7 @@ public class FingerprintForm extends javax.swing.JFrame {
         lblTitleHistory = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("DAS BIOMETRIC FINGERPRINT");
         setMinimumSize(new java.awt.Dimension(685, 490));
 
         panelFingerprint.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -204,17 +204,10 @@ public class FingerprintForm extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        panelButtons.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        panelButtons.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "CourseGroup Management", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION));
 
-        btnIdentify.setText("Identify");
-        btnIdentify.setPreferredSize(new java.awt.Dimension(160, 30));
-        btnIdentify.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnIdentifyActionPerformed(evt);
-            }
-        });
-
-        btnSave.setText("Save");
+        btnSave.setText("Save Fingerprint");
+        btnSave.setToolTipText("Asignar huella a un estudiante");
         btnSave.setPreferredSize(new java.awt.Dimension(160, 30));
         btnSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -255,47 +248,41 @@ public class FingerprintForm extends javax.swing.JFrame {
             }
         });
 
-        lblTitle.setText("WELCOME TO THE JUNGLE!");
+        lblTitle.setText("WELCOME TO DAS BF");
 
         javax.swing.GroupLayout panelButtonsLayout = new javax.swing.GroupLayout(panelButtons);
         panelButtons.setLayout(panelButtonsLayout);
         panelButtonsLayout.setHorizontalGroup(
             panelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelButtonsLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelButtonsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(panelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(lblTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(panelButtonsLayout.createSequentialGroup()
-                        .addGroup(panelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(btnIdentify, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnSave, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelButtonsLayout.createSequentialGroup()
+                        .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(panelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(panelButtonsLayout.createSequentialGroup()
-                                .addComponent(cmbCourseGroups, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnRegisterParticipation, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(panelButtonsLayout.createSequentialGroup()
-                                .addComponent(btnStop, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGap(11, 11, 11)
-                                .addComponent(btnRegisterAssistance, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addComponent(btnStop, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnRegisterAssistance, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelButtonsLayout.createSequentialGroup()
+                        .addComponent(cmbCourseGroups, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnRegisterParticipation, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         panelButtonsLayout.setVerticalGroup(
             panelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelButtonsLayout.createSequentialGroup()
-                .addContainerGap()
                 .addComponent(lblTitle)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnIdentify, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnRegisterParticipation, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(cmbCourseGroups, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addGroup(panelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cmbCourseGroups, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnRegisterParticipation, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(12, 12, 12)
                 .addGroup(panelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnRegisterAssistance, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnStop, javax.swing.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE))
+                    .addComponent(btnStop, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnRegisterAssistance, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -330,7 +317,7 @@ public class FingerprintForm extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(lblTitleHistory)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(scrollHistory, javax.swing.GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
+                .addComponent(scrollHistory, javax.swing.GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -383,10 +370,6 @@ public class FingerprintForm extends javax.swing.JFrame {
         this.fingerprintController.enableSave();
     }//GEN-LAST:event_btnSaveActionPerformed
 
-    private void btnIdentifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIdentifyActionPerformed
-        this.fingerprintController.enableIdentify();
-    }//GEN-LAST:event_btnIdentifyActionPerformed
-
     public static void start() {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -421,7 +404,6 @@ public class FingerprintForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnIdentify;
     private javax.swing.JButton btnRegisterAssistance;
     private javax.swing.JButton btnRegisterParticipation;
     private javax.swing.JButton btnSave;
