@@ -2,6 +2,7 @@
 Dactilar Digital Persona 4500 is a desktop application to manage fingerprint reader.
 
 ## Getting started
+
 ### Prerequisites:
 
 | Item| Specifications|
@@ -13,21 +14,29 @@ Dactilar Digital Persona 4500 is a desktop application to manage fingerprint rea
 | Database| [MySQL](https://dev.mysql.com/downloads/windows/installer/8.0.html)|
 | Fingerprint Reader | Digital Persona 4500 Drivers |
 
+### User Installation:
 
-#### Libs
+1. Download specific folder of `/src/releases/[specific version]`
+2. Follow the instructions in the `LEEME.txt` file
+
+### Developer Installation:
+
+#### Libs [for developers]
 
 It suggest create folder in `/dist/libs/*`
 
 - [MySQL Connector / J 5.1.49](https://dev.mysql.com/downloads/connector/j/5.1.html) (Find version)
 
-- *One Touch for Windows SDK [(Link Suggested)](https://github.com/Eliezer090/JavaLibsPersonal/blob/master/JavaLibs.rar):*
+- *One Touch for Windows SDK [(Link Suggested)](https://github.com/Eliezer090/JavaLibsPersonal/blob/master/JavaLibs.rar): or in `src/releases/[version]/resources for scrip/lib`*
 
   - dpfpenrollment
   - dpfpverification
   - dpotapi
   - dpotjni
 
-#### Database config
+- Program to open the installer script: Inno Setup Compiler version 6.2.2
+
+#### Database config [for developers]
 
 1. Copy from /src/config/database.properties.example to /src/config/database.properties
 2. Complete with database credencials
