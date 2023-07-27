@@ -5,11 +5,15 @@
  */
 package config;
 
-import java.io.FileInputStream;
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Properties;
+import javax.swing.JOptionPane;
+import utils.SecureEncryption;
 
 /**
  *
@@ -30,9 +34,11 @@ public class PropertiesFile {
         if(this.properties == null){
             this.properties = new Properties();
             try{
-                String path = "src/config/"+this.propertyType+".properties";              
-                InputStream in = new FileInputStream(path);
-                this.properties.load(in);
+                ArrayList<String> decodeProperties = decodeProperties();
+                for (String line: decodeProperties){
+                    String[] parts = line.split("=");
+                    this.properties.setProperty(parts[0].strip(), parts[1].strip());    
+                }
             } catch(FileNotFoundException e){
                 e.printStackTrace();
             } catch(IOException e){
@@ -46,4 +52,25 @@ public class PropertiesFile {
         return getProperties().getProperty(nameProperty);
     }
 
+    private ArrayList<String> decodeProperties() throws IOException {
+        String path = "/config/"+this.propertyType+".properties";
+        ArrayList<String> lista = new ArrayList<>();
+        try (InputStream is = getClass().getResourceAsStream(path)) {
+            SecureEncryption enp = new SecureEncryption();
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+                String linea;
+                while ((linea = br.readLine()) != null) {
+                    String decode = enp.decodeStringDASBF(linea);
+                    lista.add(decode);
+                }
+            } catch (IOException e) {
+                System.err.format("IOException: %s%n", e);
+                JOptionPane.showMessageDialog(null, "error leyendo archivo1: "+e);
+            }
+        } catch (IOException e) {
+            System.err.format("IOException: %s%n", e);
+            JOptionPane.showMessageDialog(null, "error leyendo archivo2: "+e);
+        }
+        return lista;
+    }
 }

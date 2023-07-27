@@ -1,0 +1,30 @@
+=================================================
+DACTILAR ASYSTANCE SYSTEM - BIOMETRIC FINGERPRINT
+=================================================
+
+DAS BF es un software para el registro de asistencia 
+mediante un lector biometrico de huella, es el complemento del sistema 
+DAS Web el cual encuentra en la siguiente url https://das.itiud.org
+
+Este software fue desarrollado por el grupo de investigacion ITIUD
+de la universidad Francisco Jose de Caldas en Bogota D.C.
+
+@Todos los derechos de propiedad reservados a la Institución.
+
+Instalacion:
+
+1. Si ya ha instalado y configurado su maquina 
+como es especificado en el repositorio oficial
+https://github.com/SandoDev/BiometriaDigitalPersona_netB
+podrá ejecutar el programa con éxito
+
+2. Ejecute el archivo instalador: Installer DAS-BF.exe
+3. Siga el wizard de instalacion
+4. Se creará un acceso directo para la ejecución del programa
+5. Ejecute el programa
+6. Conecte el lector de huella
+7. Cuando el programa reconozca el lector estará listo para empezar
+a registrar asistencias
+
+Para un uso efectivo del programa
+Consulte la documentacion oficial en https://das.itiud.org/docs/
